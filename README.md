@@ -7,30 +7,30 @@ Este proyecto es una aplicación web básica para gestionar reseñas de libros, 
 ## Estructura del Proyecto
 
 ```plaintext
-project/
-├── front/                  # Carpeta para el frontend
-│   ├── public/
-│   ├── src/
-│   │   ├── components/      # Componentes React
-│   │   ├── hooks/           # Hooks personalizados (si es necesario)
-│   │   ├── pages/           # Páginas de la aplicación
-│   │   ├── services/        # Servicios para llamadas a la API
-│   │   ├── App.jsx
-│   │   ├── index.css
-│   │   └── main.jsx
-│   ├── index.html
-│   ├── package.json
-│   └── vite.config.js
-├── server/                 # Carpeta para el backend
-│   ├── controllers/         # Controladores para manejar la lógica
-│   ├── routes/              # Rutas de la API
-│   ├── utils/               # Utilidades como la conexión a CouchDB
-│   ├── scripts/             # Scripts adicionales, como para poblar la base de datos
-│   ├── dist/                # Archivos estáticos generados por Vite
-│   ├── app.js               # Configuración del servidor Express
-│   ├── package.json
-└── README.md
-
+  project/
+  ├── front/                  # Carpeta para el frontend
+  │   ├── public/
+  │   ├── src/
+  │   │   ├── components/      # Componentes React
+  │   │   ├── hooks/           # Hooks personalizados (si es necesario)
+  │   │   ├── pages/           # Páginas de la aplicación
+  │   │   ├── services/        # Servicios para llamadas a la API
+  │   │   ├── App.jsx
+  │   │   ├── index.css
+  │   │   └── main.jsx
+  │   ├── index.html
+  │   ├── package.json
+  │   └── vite.config.js
+  ├── server/                 # Carpeta para el backend
+  │   ├── controllers/         # Controladores para manejar la lógica
+  │   ├── routes/              # Rutas de la API
+  │   ├── utils/               # Utilidades como la conexión a CouchDB
+  │   ├── scripts/             # Scripts adicionales, como para poblar la base de datos
+  │   ├── dist/                # Archivos estáticos generados por Vite
+  │   ├── app.js               # Configuración del servidor Express
+  │   ├── package.json
+  └── README.md
+```
 ## Requisitos
 Node.js (v14 o superior)
 NPM (v6 o superior)
@@ -40,10 +40,11 @@ CouchDB (o cualquier base de datos compatible con el script de poblamiento)
 # Instalación y Ejecución
 
 
-```bash
-# Comando para clonar un repositorio
-git clone <tu-repositorio>
 
+# Comando para clonar un repositorio
+```bash
+git clone <tu-repositorio>
+```
 # Navegar a la carpeta del proyecto
 cd <tu-repositorio>
 
