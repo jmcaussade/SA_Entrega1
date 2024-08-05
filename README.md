@@ -46,26 +46,32 @@ CouchDB (o cualquier base de datos compatible con el script de poblamiento)
 git clone <tu-repositorio>
 ```
 # Navegar a la carpeta del proyecto
+```bash
 cd <tu-repositorio>
-
+```
 # Instalar dependencias para el backend
+```bash
 cd server
 npm install
-
+```
 # Instalar dependencias para el frontend
+```bash
 cd ../front
 npm install
-
+```
 # Construir el frontend
+```bash
 npm run build
-
+```
 # Poblar la base de datos
+```bash
 cd ../server
 node scripts/populateDatabase.js
-
+```
 # Iniciar el servidor
+```bash
 node app.js
-
+```
 
 # Descripción de los Archivos
 
