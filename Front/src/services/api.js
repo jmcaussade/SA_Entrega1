@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000', // URL del servidor Express.js
+  baseURL: 'http://localhost:5000/api', // Cambia el puerto si es necesario
 });
 
 export default api;
