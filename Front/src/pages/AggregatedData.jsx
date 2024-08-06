@@ -1,5 +1,6 @@
 import React from 'react';
 import AggregatedDataView from '../components/AggregatedData';
+import '../components/AggregatedData.css';
 
 const Data = () => {
   return (
@@ -11,4 +12,3 @@ const Data = () => {
 };
 
 export default Data;
-

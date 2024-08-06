@@ -1,0 +1,24 @@
+.table-container {
+    margin: 20px;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  .table-container th, .table-container td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .table-container th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+  
+  .table-container tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .table-container tr:hover {
+    background-color: #ddd;
+  }
