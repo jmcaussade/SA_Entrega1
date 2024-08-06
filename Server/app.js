@@ -5,6 +5,7 @@ const booksRoutes = require('./routes/books');
 const authorsRoutes = require('./routes/authors');
 const reviewsRoutes = require('./routes/reviews');
 const salesRoutes = require('./routes/sales');
+const aggregatedDataRoutes = require('./routes/aggregatedData');
 const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -19,6 +20,7 @@ app.use('/api/books', booksRoutes);
 app.use('/api/authors', authorsRoutes);
 app.use('/api/reviews', reviewsRoutes);
 app.use('/api/sales', salesRoutes);
+app.use('/api/aggregated-data', aggregatedDataRoutes);
 
 // Servir archivos estáticos del frontend
 app.use(express.static(path.join(__dirname, 'dist')));
