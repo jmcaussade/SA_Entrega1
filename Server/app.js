@@ -9,33 +9,33 @@ const reviewsRoutes = require('./routes/reviews');
 const salesRoutes = require('./routes/sales');
 const aggregatedDataRoutes = require('./routes/aggregatedData');
 
-
 const app = express();
-const PORT = process.env.PORT || 5000;
+const port = 5000;
 
+// Middleware para habilitar CORS
 app.use(cors());
+app.use(express.json()); // Middleware para parsear JSON
 
-// Middleware
-app.use(bodyParser.json());
+// Middleware para servir archivos estáticos
+app.use(express.static(path.join(__dirname, 'dist')));
 
-// Rutas API
-app.use('/api/books', booksRoutes);
+// Rutas de la API
+const authorsRoutes = require('./routes/authors');
+const booksRoutes = require('./routes/books');
+const reviewsRoutes = require('./routes/reviews');
+const salesRoutes = require('./routes/sales');
+
 app.use('/api/authors', authorsRoutes);
+app.use('/api/books', booksRoutes);
 app.use('/api/reviews', reviewsRoutes);
 app.use('/api/sales', salesRoutes);
 app.use('/api/aggregated-data', aggregatedDataRoutes);
 
-// Servir archivos estáticos del frontend
-app.use(express.static(path.join(__dirname, 'dist')));
-
-// Cualquier ruta no manejada por las rutas anteriores responderá con el archivo index.html del frontend
+// Ruta principal para la aplicación React
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-// Iniciar el servidor
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
 });
-
-module.exports = app;
