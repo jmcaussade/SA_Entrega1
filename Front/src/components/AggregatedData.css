@@ -1,0 +1,42 @@
+.table-container {
+  margin: 20px;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.table-container th, .table-container td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.table-container th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  position: relative;
+}
+
+.table-container th div {
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.table-container th select {
+  border: 1px solid #ccc;
+  padding: 2px;
+  font-size: 14px;
+}
+
+.table-container th input {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 5px;
+}
+
+.table-container tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.table-container tr:hover {
+  background-color: #ddd;
+}
