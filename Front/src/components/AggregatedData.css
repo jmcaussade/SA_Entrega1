@@ -16,18 +16,21 @@
   position: relative;
 }
 
-.table-container th button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-  padding: 0;
-  margin-right: 8px;
+.table-container th div {
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.table-container th select {
+  border: 1px solid #ccc;
+  padding: 2px;
+  font-size: 14px;
 }
 
 .table-container th input {
   width: 100%;
   box-sizing: border-box;
+  margin-top: 5px;
 }
 
 .table-container tr:nth-child(even) {

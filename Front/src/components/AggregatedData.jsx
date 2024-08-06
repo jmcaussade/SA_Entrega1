@@ -6,12 +6,18 @@ const AggregatedDataView = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'none' });
   const [filters, setFilters] = useState({
     authorName: '',
     numBooks: '',
     avgReviewScore: '',
     totalSales: ''
+  });
+  const [sortDirections, setSortDirections] = useState({
+    authorName: 'none',
+    numBooks: 'none',
+    avgReviewScore: 'none',
+    totalSales: 'none'
   });
 
   useEffect(() => {
@@ -30,7 +36,7 @@ const AggregatedDataView = () => {
   }, []);
 
   const sortedData = [...data].sort((a, b) => {
-    if (sortConfig.key) {
+    if (sortConfig.key && sortConfig.direction !== 'none') {
       const aValue = a[sortConfig.key];
       const bValue = b[sortConfig.key];
       if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
@@ -49,12 +55,14 @@ const AggregatedDataView = () => {
     );
   });
 
-  const requestSort = key => {
-    let direction = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
-    }
+  const requestSort = (key, direction) => {
     setSortConfig({ key, direction });
+    setSortDirections({
+      authorName: key === 'authorName' ? direction : 'none',
+      numBooks: key === 'numBooks' ? direction : 'none',
+      avgReviewScore: key === 'avgReviewScore' ? direction : 'none',
+      totalSales: key === 'totalSales' ? direction : 'none'
+    });
   };
 
   const handleFilterChange = (key, value) => {
@@ -72,9 +80,17 @@ const AggregatedDataView = () => {
           <tr>
             <th>#</th>
             <th>
-              <button onClick={() => requestSort('authorName')}>
-                Author
-              </button>
+              Author
+              <div>
+                <select
+                  value={sortDirections.authorName}
+                  onChange={e => requestSort('authorName', e.target.value)}
+                >
+                  <option value="none">No Sort</option>
+                  <option value="asc">Ascending</option>
+                  <option value="desc">Descending</option>
+                </select>
+              </div>
               <input
                 type="text"
                 value={filters.authorName}
@@ -82,9 +98,17 @@ const AggregatedDataView = () => {
               />
             </th>
             <th>
-              <button onClick={() => requestSort('numBooks')}>
-                Number of Published Books
-              </button>
+              Number of Published Books
+              <div>
+                <select
+                  value={sortDirections.numBooks}
+                  onChange={e => requestSort('numBooks', e.target.value)}
+                >
+                  <option value="none">No Sort</option>
+                  <option value="asc">Ascending</option>
+                  <option value="desc">Descending</option>
+                </select>
+              </div>
               <input
                 type="text"
                 value={filters.numBooks}
@@ -92,9 +116,17 @@ const AggregatedDataView = () => {
               />
             </th>
             <th>
-              <button onClick={() => requestSort('avgReviewScore')}>
-                Average Review Score
-              </button>
+              Average Review Score
+              <div>
+                <select
+                  value={sortDirections.avgReviewScore}
+                  onChange={e => requestSort('avgReviewScore', e.target.value)}
+                >
+                  <option value="none">No Sort</option>
+                  <option value="asc">Ascending</option>
+                  <option value="desc">Descending</option>
+                </select>
+              </div>
               <input
                 type="text"
                 value={filters.avgReviewScore}
@@ -102,9 +134,17 @@ const AggregatedDataView = () => {
               />
             </th>
             <th>
-              <button onClick={() => requestSort('totalSales')}>
-                Total Sales
-              </button>
+              Total Sales
+              <div>
+                <select
+                  value={sortDirections.totalSales}
+                  onChange={e => requestSort('totalSales', e.target.value)}
+                >
+                  <option value="none">No Sort</option>
+                  <option value="asc">Ascending</option>
+                  <option value="desc">Descending</option>
+                </select>
+              </div>
               <input
                 type="text"
                 value={filters.totalSales}
