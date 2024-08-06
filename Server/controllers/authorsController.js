@@ -1,6 +1,14 @@
 const nano = require('nano')('http://admin:admin@127.0.0.1:5984');
 const db = nano.use('bookstore');
 
+// Function to fetch authors from the database
+const fetchAuthors = async () => {
+  const result = await db.list({ include_docs: true });
+  return result.rows.filter(row => row.doc.type === 'author').map(row => row.doc);
+};
+
+exports.fetchAuthors = fetchAuthors;
+
 exports.createAuthor = async (req, res) => {
   try {
     const result = await db.insert(req.body);
@@ -12,8 +20,7 @@ exports.createAuthor = async (req, res) => {
 
 exports.getAuthors = async (req, res) => {
   try {
-    const result = await db.list({ include_docs: true });
-    const authors = result.rows.filter(row => row.doc.type === 'author').map(row => row.doc);
+    const authors = await fetchAuthors();
     res.status(200).json(authors);
   } catch (error) {
     res.status(500).json({ error: error.message });

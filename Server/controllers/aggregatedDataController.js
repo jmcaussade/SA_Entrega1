@@ -1,23 +1,27 @@
-const db = require('../db'); // Adjust the path as needed
+const nano = require('nano')('http://admin:admin@127.0.0.1:5984');
+const db = nano.use('bookstore');
+const { fetchAuthors } = require('./authorsController');
 
 const getAggregatedData = async (req, res) => {
   try {
-    const authors = await db.view('design', 'authors', { include_docs: true });
-    const books = await db.view('design', 'books', { include_docs: true });
-    const reviews = await db.view('design', 'reviews', { include_docs: true });
-    const sales = await db.view('design', 'sales', { include_docs: true });
+    const authors = await fetchAuthors();
+    const books = await db.list({ include_docs: true });
+    const reviews = await db.list({ include_docs: true });
+    const sales = await db.list({ include_docs: true });
 
-    const authorData = authors.rows.map(row => row.doc);
+    const bookDocs = books.rows.filter(row => row.doc.type === 'book').map(row => row.doc);
+    const reviewDocs = reviews.rows.filter(row => row.doc.type === 'review').map(row => row.doc);
+    const salesDocs = sales.rows.filter(row => row.doc.type === 'sale').map(row => row.doc);
 
-    const aggregatedData = authorData.map(author => {
-      const authorBooks = books.rows.filter(row => row.doc.author === author._id);
+    const aggregatedData = authors.map(author => {
+      const authorBooks = bookDocs.filter(book => book.author === author._id);
       const numBooks = authorBooks.length;
 
-      const authorReviews = reviews.rows.filter(row => authorBooks.some(book => book.doc._id === row.doc.book));
-      const avgReviewScore = authorReviews.reduce((sum, row) => sum + row.doc.score, 0) / authorReviews.length || 0;
+      const authorReviews = reviewDocs.filter(review => authorBooks.some(book => book._id === review.book));
+      const avgReviewScore = authorReviews.reduce((sum, review) => sum + review.score, 0) / authorReviews.length || 0;
 
-      const authorSales = sales.rows.filter(row => authorBooks.some(book => book.doc._id === row.doc.book));
-      const totalSales = authorSales.reduce((sum, row) => sum + row.doc.sales, 0);
+      const authorSales = salesDocs.filter(sale => authorBooks.some(book => book._id === sale.book));
+      const totalSales = authorSales.reduce((sum, sale) => sum + sale.sales, 0);
 
       return {
         authorName: author.name,
@@ -34,6 +38,4 @@ const getAggregatedData = async (req, res) => {
   }
 };
 
-module.exports = {
-  getAggregatedData,
-};
+module.exports = { getAggregatedData };

@@ -1,12 +1,15 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
+const cors = require("cors");
+
 const booksRoutes = require('./routes/books');
 const authorsRoutes = require('./routes/authors');
 const reviewsRoutes = require('./routes/reviews');
 const salesRoutes = require('./routes/sales');
 const aggregatedDataRoutes = require('./routes/aggregatedData');
-const cors = require("cors");
+
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
