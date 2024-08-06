@@ -1,43 +1,61 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import AuthorForm from './AuthorForm';
 
 const AuthorList = () => {
   const [authors, setAuthors] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [editingAuthor, setEditingAuthor] = useState(null);
 
   useEffect(() => {
-    const fetchAuthors = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/authors'); // Ajusta la URL según tu backend
-        if (Array.isArray(response.data)) {
-          setAuthors(response.data);
-        } else {
-          throw new Error('Response data is not an array');
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchAuthors();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  const fetchAuthors = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/authors');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      setAuthors(data);
+    } catch (error) {
+      setError(error);
+    }
+  };
+
+  const deleteAuthor = async (id) => {
+    try {
+      await fetch(`http://localhost:5000/api/authors/${id}`, {
+        method: 'DELETE',
+      });
+      fetchAuthors();
+    } catch (error) {
+      setError(error);
+    }
+  };
+
+  const editAuthor = (author) => {
+    setEditingAuthor(author);
+  };
+
+  const clearEditing = () => {
+    setEditingAuthor(null);
+  };
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return (
     <div>
-      <h1>Authors</h1>
+      <h2>Authors</h2>
+      <AuthorForm fetchAuthors={fetchAuthors} editingAuthor={editingAuthor} clearEditing={clearEditing} />
       <ul>
         {authors.map((author) => (
-          <li key={author.id}>
-            <h2>{author.name}</h2>
-            <p>Date of Birth: {author.date_of_birth}</p>
-            <p>Country: {author.country_of_origin}</p>
-            <p>Description: {author.description}</p>
+          <li key={author._id}>
+            {author.name}
+            <button onClick={() => editAuthor(author)}>Edit</button>
+            <button onClick={() => deleteAuthor(author._id)}>Delete</button>
           </li>
         ))}
       </ul>

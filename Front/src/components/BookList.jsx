@@ -1,36 +1,52 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import BookForm from './BookForm';
 
-const Books = () => {
+const BookList = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [editingBook, setEditingBook] = useState(null);
 
   useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/books'); // Ajusta la URL según tu backend
-        if (Array.isArray(response.data)) {
-          setBooks(response.data);
-        } else {
-          throw new Error('Response data is not an array');
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchBooks();
   }, []);
+
+  const fetchBooks = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/books');
+      setBooks(response.data);
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+
+  const deleteBook = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/books/${id}`);
+      fetchBooks();
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  const editBook = (book) => {
+    setEditingBook(book);
+  };
+
+  const clearEditing = () => {
+    setEditingBook(null);
+  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
     <div>
-      <h1>Books</h1>
+      <h2>Books</h2>
+      <BookForm fetchBooks={fetchBooks} editingBook={editingBook} clearEditing={clearEditing} />
       <ul>
         {books.map((book) => (
           <li key={book.id}>
@@ -39,6 +55,8 @@ const Books = () => {
             <p>Date of Publication: {book.date_of_publication}</p>
             <p>Number of Sales: {book.number_of_sales}</p>
             <p>Author ID: {book.author}</p>
+            <button onClick={() => editBook(book)}>Edit</button>
+            <button onClick={() => deleteBook(book.id)}>Delete</button>
           </li>
         ))}
       </ul>
@@ -46,4 +64,4 @@ const Books = () => {
   );
 };
 
-export default Books;
+export default BookList;
