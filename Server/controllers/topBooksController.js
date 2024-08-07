@@ -15,7 +15,7 @@ const getTopRatedBooks = async (req, res) => {
     const authors = await fetchAuthors();
 
     // Log fetched authors
-    console.log('Fetched Authors:', authors);
+    console.log('Fetched Authors:', JSON.stringify(authors, null, 2));
 
     const books = booksResult.rows.filter(row => row.doc.type === 'book').map(row => row.doc);
     const reviews = reviewsResult.rows.filter(row => row.doc.type === 'review').map(row => row.doc);
@@ -27,12 +27,13 @@ const getTopRatedBooks = async (req, res) => {
     }, {});
 
     // Log author map
-    console.log('Author Map:', authorMap);
+    console.log('Author Map:', JSON.stringify(authorMap, null, 2));
 
     // Calculate average rating for each book
     const booksWithAvgRating = books.map(book => {
-      const bookReviews = reviews.filter(review => review.doc.book === book._id);
-      const avgRating = bookReviews.reduce((acc, review) => acc + review.doc.score, 0) / bookReviews.length || 0;
+      const bookReviews = reviews.filter(review => review.book === book._id);
+      console.log(`Book ID: ${book._id}, Reviews: ${JSON.stringify(bookReviews, null, 2)}`);
+      const avgRating = bookReviews.reduce((acc, review) => acc + (review.score || 0), 0) / (bookReviews.length || 1);
       return { ...book, avgRating };
     });
 
@@ -47,7 +48,7 @@ const getTopRatedBooks = async (req, res) => {
     }));
 
     // Log top books with authors
-    console.log('Top Rated Books with Authors:', topBooksWithAuthors);
+    console.log('Top Rated Books with Authors:', JSON.stringify(topBooksWithAuthors, null, 2));
 
     res.json(topBooksWithAuthors);
   } catch (err) {
