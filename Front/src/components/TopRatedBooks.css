@@ -1,0 +1,40 @@
+/* TopBooksView.css */
+
+.top-books-container {
+    padding: 20px;
+  }
+  
+  .loading, .error {
+    font-size: 18px;
+    color: #333;
+  }
+  
+  .top-books-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .top-books-table th, .top-books-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+  }
+  
+  .top-books-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+  
+  .top-books-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .top-books-table tr:hover {
+    background-color: #eaeaea;
+  }
+  
+  .top-books-table td {
+    word-wrap: break-word;
+  }
+  

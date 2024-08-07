@@ -1,60 +1,82 @@
 const nano = require('nano')('http://admin:admin@127.0.0.1:5984');
 const db = nano.use('bookstore');
 
-// Function to fetch authors from the database
-const fetchAuthors = async () => {
-  const result = await db.list({ include_docs: true });
-  return result.rows.filter(row => row.doc.type === 'author').map(row => row.doc);
-};
-
-// Function to get top rated books
 const getTopRatedBooks = async (req, res) => {
   try {
-    const booksResult = await db.list({ include_docs: true });
-    const reviewsResult = await db.list({ include_docs: true });
-    const authors = await fetchAuthors();
+    console.log("Retrieving data...");
 
-    // Log fetched authors
-    console.log('Fetched Authors:', JSON.stringify(authors, null, 2));
+    const books = await db.list({ include_docs: true });
+    const reviews = await db.list({ include_docs: true });
+    const authors = await db.list({ include_docs: true });
 
-    const books = booksResult.rows.filter(row => row.doc.type === 'book').map(row => row.doc);
-    const reviews = reviewsResult.rows.filter(row => row.doc.type === 'review').map(row => row.doc);
+    const bookDocs = books.rows.filter(row => row.doc.type === 'book').map(row => row.doc);
+    const reviewDocs = reviews.rows.filter(row => row.doc.type === 'review').map(row => row.doc);
+    const authorDocs = authors.rows.filter(row => row.doc.type === 'author').map(row => row.doc);
 
-    // Map author IDs to names
-    const authorMap = authors.reduce((map, author) => {
+    console.log('Books Documents:', bookDocs);
+    console.log('Reviews Documents:', reviewDocs);
+    console.log('Authors Documents:', authorDocs);
+
+    // Create an author map
+    const authorsMap = authorDocs.reduce((map, author) => {
       map[author._id] = author.name;
       return map;
     }, {});
 
-    // Log author map
-    console.log('Author Map:', JSON.stringify(authorMap, null, 2));
+    console.log('Authors Map:', authorsMap);
 
-    // Calculate average rating for each book
-    const booksWithAvgRating = books.map(book => {
-      const bookReviews = reviews.filter(review => review.book === book._id);
-      console.log(`Book ID: ${book._id}, Reviews: ${JSON.stringify(bookReviews, null, 2)}`);
-      const avgRating = bookReviews.reduce((acc, review) => acc + (review.score || 0), 0) / (bookReviews.length || 1);
-      return { ...book, avgRating };
+    // Group reviews by book ID
+    const reviewsByBook = reviewDocs.reduce((acc, review) => {
+      if (!acc[review.book]) {
+        acc[review.book] = [];
+      }
+      acc[review.book].push(review);
+      return acc;
+    }, {});
+
+    console.log('Reviews By Book:', reviewsByBook);
+
+    // Process books and calculate average ratings
+    const booksWithRatings = bookDocs.map(book => {
+      const bookReviews = reviewsByBook[book._id] || [];
+
+      // Find highest and lowest upvoted reviews
+      const highestRatedReview = bookReviews.reduce((max, review) => 
+        (review.number_of_upvotes > (max.number_of_upvotes || 0) ? review : max), {}
+      );
+      const lowestRatedReview = bookReviews.reduce((min, review) => 
+        (review.number_of_upvotes < (min.number_of_upvotes || Infinity) ? review : min), {}
+      );
+
+      return {
+        title: book.name,
+        author: authorsMap[book.author] || 'Unknown',
+        avgRating: calculateAvgRating(book._id, reviewsByBook),
+        highestRatedReview: highestRatedReview.review || 'No review available',
+        lowestRatedReview: lowestRatedReview.review || 'No review available'
+      };
     });
 
-    // Sort books by average rating and get top 10
-    const topRatedBooks = booksWithAvgRating.sort((a, b) => b.avgRating - a.avgRating).slice(0, 10);
+    // Sort books by average rating in descending order and get top 10
+    const topBooks = booksWithRatings
+      .sort((a, b) => b.avgRating - a.avgRating)
+      .slice(0, 10);
 
-    // Include author names
-    const topBooksWithAuthors = topRatedBooks.map(book => ({
-      name: book.name,
-      author: authorMap[book.author] || 'Unknown',
-      avgRating: book.avgRating
-    }));
+    console.log('Top 10 Books:', topBooks);
 
-    // Log top books with authors
-    console.log('Top Rated Books with Authors:', JSON.stringify(topBooksWithAuthors, null, 2));
-
-    res.json(topBooksWithAuthors);
+    res.json(topBooks);
   } catch (err) {
-    console.error(err);
+    console.error('Error in getTopRatedBooks:', err);
     res.status(500).send('Server error');
   }
+};
+
+// Function to calculate average rating for a book
+const calculateAvgRating = (bookId, reviewsByBook) => {
+  const reviews = reviewsByBook[bookId] || [];
+  if (reviews.length === 0) return 0;
+  const total = reviews.reduce((sum, review) => sum + review.score, 0);
+  return total / reviews.length;
 };
 
 module.exports = { getTopRatedBooks };
