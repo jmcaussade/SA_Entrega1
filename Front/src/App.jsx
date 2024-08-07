@@ -4,7 +4,8 @@ import Authors from './pages/Authors';
 import Books from './pages/Books';
 import Reviews from './pages/Reviews';
 import Sales from './pages/Sales';
-import AggregatedData from './pages/AggregatedData'; // Import the new component
+import AggregatedData from './pages/AggregatedData';
+import TopRatedBooks from './pages/TopRatedBooks';
 import './index.css';
 
 const App = () => {
@@ -20,6 +21,7 @@ const App = () => {
               <li><Link to="/reviews">Reviews</Link></li>
               <li><Link to="/sales">Sales</Link></li>
               <li><Link to="/aggregated-data">Aggregated Data</Link></li>
+              <li><Link to="/top-rated-books">Top Rated Books</Link></li>
             </ul>
           </nav>
         </header>
@@ -30,6 +32,7 @@ const App = () => {
             <Route path="/reviews" element={<Reviews />} />
             <Route path="/sales" element={<Sales />} />
             <Route path="/aggregated-data" element={<AggregatedData />} />
+            <Route path="/top-rated-books" element={<TopRatedBooks />} />
           </Routes>
         </main>
       </div>
