@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const TopRatedBooks = () => {
+const TopBooksView = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,37 +26,21 @@ const TopRatedBooks = () => {
 
   return (
     <div>
-      <h1>Top 10 Rated Books</h1>
+      <h1>Top Rated Books</h1>
       <table>
         <thead>
           <tr>
-            <th>#</th>
             <th>Title</th>
             <th>Author</th>
             <th>Average Rating</th>
-            <th>Highest Rated Review</th>
-            <th>Lowest Rated Review</th>
           </tr>
         </thead>
         <tbody>
           {data.map((book, index) => (
-            <tr key={book._id}>
-              <td>{index + 1}</td>
-              <td>{book.title}</td>
+            <tr key={index}>
+              <td>{book.name}</td>
               <td>{book.author}</td>
               <td>{book.avgRating.toFixed(2)}</td>
-              <td>
-                <div>
-                  <p>{book.highestRatedReview.content}</p>
-                  <p>Upvotes: {book.highestRatedReview.upvotes}</p>
-                </div>
-              </td>
-              <td>
-                <div>
-                  <p>{book.lowestRatedReview.content}</p>
-                  <p>Upvotes: {book.lowestRatedReview.upvotes}</p>
-                </div>
-              </td>
             </tr>
           ))}
         </tbody>
@@ -65,4 +49,4 @@ const TopRatedBooks = () => {
   );
 };
 
-export default TopRatedBooks;
+export default TopBooksView;

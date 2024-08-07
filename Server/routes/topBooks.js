@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const topBooksController = require('../controllers/topBooksController');
+const { getTopRatedBooks } = require('../controllers/topBooksController');
 
-router.get('/', topBooksController.getTopRatedBooks);
+router.get('/', getTopRatedBooks);
 
 module.exports = router;
