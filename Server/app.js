@@ -10,6 +10,9 @@ const salesRoutes = require('./routes/sales');
 const aggregatedDataRoutes = require('./routes/aggregatedData');
 const topBooksRoutes = require('./routes/topBooks');
 const searchBooksRoutes = require('./routes/searchBooks')
+const topsalesRoutes = require('./routes/topsales')
+
+
 
 const app = express();
 const port = 5000;
@@ -29,6 +32,9 @@ app.use('/api/sales', salesRoutes);
 app.use('/api/aggregated-data', aggregatedDataRoutes);
 app.use('/api/top-books', topBooksRoutes);
 app.use('/api/search-books', searchBooksRoutes);
+app.use('/api/top-sales', topsalesRoutes)
+
+
 
 
 // Ruta principal para la aplicación React
