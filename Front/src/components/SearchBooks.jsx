@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import './SearchBooks.css'; // Importing the CSS file for styling
 
 const SearchBooks = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -33,25 +34,26 @@ const SearchBooks = () => {
   };
 
   return (
-    <div>
+    <div className="search-books-container">
       <input
         type="text"
-        placeholder="Search by description..."
+        placeholder="Search by summary..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
+        className="search-input"
       />
-      <button onClick={handleSearch} disabled={loading}>
+      <button onClick={handleSearch} disabled={loading} className="search-button">
         {loading ? 'Searching...' : 'Search'}
       </button>
       {loading && <p>Loading...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className="error-text">{error}</p>}
       {results.length > 0 ? (
-        <table>
+        <table className="results-table">
           <thead>
             <tr>
               <th>Title</th>
               <th>Author</th>
-              <th>Description</th>
+              <th>Summary</th>
             </tr>
           </thead>
           <tbody>
