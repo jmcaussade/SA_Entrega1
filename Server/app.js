@@ -22,11 +22,6 @@ app.use(express.json()); // Middleware para parsear JSON
 app.use(express.static(path.join(__dirname, 'dist')));
 
 // // Rutas de la API
-// const authorsRoutes = require('./routes/authors');
-// const booksRoutes = require('./routes/books');
-// const reviewsRoutes = require('./routes/reviews');
-// const salesRoutes = require('./routes/sales');
-
 app.use('/api/authors', authorsRoutes);
 app.use('/api/books', booksRoutes);
 app.use('/api/reviews', reviewsRoutes);

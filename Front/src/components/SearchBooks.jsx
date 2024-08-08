@@ -2,71 +2,74 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const SearchBooks = () => {
-  const [query, setQuery] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState([]);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
+  const handleSearch = async () => {
+    if (!searchTerm.trim()) {
+      setResults([]); // Clear results if search term is empty
+      return;
+    }
+    setLoading(true);
+    setError('');
     try {
-      const response = await axios.get('http://localhost:5000/api/search-books', {
-        params: {
-          query,
-          page
-        }
+      const response = await axios.get(`http://localhost:5000/api/search-books`, {
+        params: { query: searchTerm },
       });
-      setResults(response.data.books);
-      setTotalPages(response.data.totalPages);
+      console.log('Search results:', response.data); // Log results
+      if (Array.isArray(response.data)) {
+        setResults(response.data);
+      } else {
+        setResults([]);
+        setError('Unexpected response format');
+        console.error('Unexpected response format:', response.data);
+      }
     } catch (error) {
       console.error('Error fetching search results:', error);
+      setError('Error fetching search results');
+      setResults([]); // Clear results on error
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const handlePageChange = (newPage) => {
-    setPage(newPage);
-    handleSearch();
   };
 
   return (
     <div>
-      <form onSubmit={handleSearch}>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search for books..."
-        />
-        <button type="submit">Search</button>
-      </form>
-
-      <div>
-        {results.length > 0 && (
-          <div>
-            <ul>
-              {results.map((book, index) => (
-                <li key={index}>{book.title} - {book.description}</li>
-              ))}
-            </ul>
-
-            <div>
-              <button
-                disabled={page === 1}
-                onClick={() => handlePageChange(page - 1)}
-              >
-                Previous
-              </button>
-              <span>Page {page} of {totalPages}</span>
-              <button
-                disabled={page === totalPages}
-                onClick={() => handlePageChange(page + 1)}
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+      <input
+        type="text"
+        placeholder="Search by description..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      <button onClick={handleSearch} disabled={loading}>
+        {loading ? 'Searching...' : 'Search'}
+      </button>
+      {loading && <p>Loading...</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {results.length > 0 ? (
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {results.map((book) => (
+              <tr key={book._id}>
+                <td>{book.title}</td>
+                <td>{book.author}</td>
+                <td>{book.description}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p>No results found</p>
+      )}
     </div>
   );
 };
