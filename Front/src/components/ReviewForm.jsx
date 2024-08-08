@@ -22,7 +22,7 @@ const ReviewForm = ({ fetchReviews, editingReview, clearEditing }) => {
 
     try {
       if (editingReview) {
-        await axios.put(`http://localhost:5000/api/reviews/${editingReview.id}`, reviewData);
+        await axios.put(`http://localhost:5000/api/reviews/${editingReview._id}`, reviewData);
       } else {
         await axios.post('http://localhost:5000/api/reviews', reviewData);
       }
