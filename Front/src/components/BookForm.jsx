@@ -21,10 +21,11 @@ const BookForm = ({ fetchBooks, editingBook, clearEditing }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const bookData = { name, summary, date_of_publication: dateOfPublication, number_of_sales: numberOfSales, author };
-
+  
     try {
       if (editingBook) {
-        await axios.put(`http://localhost:5000/api/books/${editingBook.id}`, bookData);
+        // Usa `_id` en lugar de `id` si tu backend espera `_id`
+        await axios.put(`http://localhost:5000/api/books/${editingBook._id}`, bookData);
       } else {
         await axios.post('http://localhost:5000/api/books', bookData);
       }
@@ -34,6 +35,7 @@ const BookForm = ({ fetchBooks, editingBook, clearEditing }) => {
       console.error('Error:', error);
     }
   };
+  
 
   const clearForm = () => {
     setName('');
