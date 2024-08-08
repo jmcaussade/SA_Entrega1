@@ -8,19 +8,18 @@ const SaleForm = ({ fetchSales, editingSale, clearEditing }) => {
 
   useEffect(() => {
     if (editingSale) {
-      setBook(editingSale.book);
-      setYear(editingSale.year);
-      setSales(editingSale.sales);
+      setBook(editingSale.book || '');
+      setYear(editingSale.year || '');
+      setSales(editingSale.sales || '');
     }
   }, [editingSale]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const saleData = { book, year, sales };
-  
+    const saleData = { book, year: parseInt(year), sales: parseInt(sales) }; // Ensure year and sales are numbers
+
     try {
       if (editingSale) {
-        // Usa `_id` en lugar de `id` si tu backend espera `_id`
         await axios.put(`http://localhost:5000/api/sales/${editingSale._id}`, saleData);
       } else {
         await axios.post('http://localhost:5000/api/sales', saleData);
@@ -31,7 +30,7 @@ const SaleForm = ({ fetchSales, editingSale, clearEditing }) => {
       console.error('Error:', error);
     }
   };
-  
+
   const clearForm = () => {
     setBook('');
     setYear('');
@@ -50,6 +49,7 @@ const SaleForm = ({ fetchSales, editingSale, clearEditing }) => {
             value={book}
             onChange={(e) => setBook(e.target.value)}
             required
+            placeholder="Enter book ID"
           />
         </label>
         <label>
@@ -59,6 +59,7 @@ const SaleForm = ({ fetchSales, editingSale, clearEditing }) => {
             value={year}
             onChange={(e) => setYear(e.target.value)}
             required
+            placeholder="Enter year"
           />
         </label>
         <label>
@@ -68,6 +69,7 @@ const SaleForm = ({ fetchSales, editingSale, clearEditing }) => {
             value={sales}
             onChange={(e) => setSales(e.target.value)}
             required
+            placeholder="Enter sales"
           />
         </label>
         <button type="submit">{editingSale ? 'Update' : 'Add'}</button>
