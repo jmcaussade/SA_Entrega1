@@ -3,6 +3,11 @@
     font-family: Arial, sans-serif;
   }
   
+  .search-bar {
+    display: flex;
+    align-items: center;
+  }
+  
   .search-input {
     padding: 10px;
     margin-right: 10px;
@@ -23,6 +28,22 @@
   .search-button:disabled {
     background-color: #ccc;
     cursor: not-allowed;
+  }
+  
+  .clear-button {
+    padding: 10px;
+    margin-left: 10px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+  }
+  
+  .clear-button:hover {
+    background-color: #c62828;
   }
   
   .error-text {
@@ -51,6 +72,27 @@
   }
   
   .results-table tr:hover {
+    background-color: #ddd;
+  }
+  
+  .pagination {
+    margin-top: 20px;
+  }
+  
+  .pagination button {
+    padding: 8px 16px;
+    margin: 0 4px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    cursor: pointer;
+  }
+  
+  .pagination button.active {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .pagination button:hover:not(.active) {
     background-color: #ddd;
   }
   

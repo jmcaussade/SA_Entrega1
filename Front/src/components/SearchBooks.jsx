@@ -36,6 +36,13 @@ const SearchBooks = () => {
     }
   };
 
+  const handleClear = () => {
+    setSearchTerm('');
+    setResults([]);
+    setError('');
+    setCurrentPage(1);
+  };
+
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -45,16 +52,23 @@ const SearchBooks = () => {
 
   return (
     <div className="search-books-container">
-      <input
-        type="text"
-        placeholder="Search by summary..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="search-input"
-      />
-      <button onClick={handleSearch} disabled={loading} className="search-button">
-        {loading ? 'Searching...' : 'Search'}
-      </button>
+      <div className="search-bar">
+        <input
+          type="text"
+          placeholder="Search by summary..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="search-input"
+        />
+        <button onClick={handleSearch} disabled={loading} className="search-button">
+          {loading ? 'Searching...' : 'Search'}
+        </button>
+        {searchTerm && (
+          <button onClick={handleClear} className="clear-button">
+            ×
+          </button>
+        )}
+      </div>
       {loading && <p>Loading...</p>}
       {error && <p className="error-text">{error}</p>}
       {results.length > 0 ? (
@@ -62,9 +76,9 @@ const SearchBooks = () => {
           <table className="results-table">
             <thead>
               <tr>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Summary</th>
+                <th>Book Title</th>
+                <th>Author ID</th>
+                <th>Description</th>
               </tr>
             </thead>
             <tbody>
