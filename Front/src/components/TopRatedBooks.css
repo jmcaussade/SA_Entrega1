@@ -1,76 +1,41 @@
-.search-books-container {
+.top-books-container {
   margin: 20px;
   font-family: Arial, sans-serif;
 }
 
-.search-input {
-  padding: 10px;
-  margin-right: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 300px;
-}
-
-.search-button {
-  padding: 10px 20px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.search-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-.error-text {
-  color: red;
-}
-
-.results-table {
+.top-books-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
 }
 
-.results-table th,
-.results-table td {
+.top-books-table th,
+.top-books-table td {
   border: 1px solid #ddd;
-  padding: 8px;
-}
-
-.results-table th {
-  background-color: #f2f2f2;
+  padding: 8px; /* Updated to match other table */
   text-align: left;
 }
 
-.results-table tr:nth-child(even) {
-  background-color: #f9f9f9;
+.top-books-table th {
+  background-color: #f2f2f2; /* Matches the other table's header color */
+  font-weight: bold; /* Added to match other table's header font weight */
 }
 
-.results-table tr:hover {
-  background-color: #ddd;
+.top-books-table tr:nth-child(even) {
+  background-color: #f9f9f9; /* Matches the other table's alternating row color */
 }
 
-.pagination {
-  margin-top: 20px;
+.top-books-table tr:hover {
+  background-color: #ddd; /* Matches the hover color from the other table */
 }
 
-.pagination button {
-  padding: 8px 16px;
-  margin: 0 4px;
-  border: 1px solid #ddd;
-  background-color: #f9f9f9;
-  cursor: pointer;
+.loading,
+.error {
+  text-align: center;
+  font-size: 18px;
+  margin: 20px;
 }
 
-.pagination button.active {
-  background-color: #4CAF50;
-  color: white;
-}
-
-.pagination button:hover:not(.active) {
-  background-color: #ddd;
+.error {
+  color: red;
 }

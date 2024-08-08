@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './TopRatedBooks.css';
 
-const TopBooksView = () => {
+const TopRatedBooks = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -41,13 +41,13 @@ const TopBooksView = () => {
         </thead>
         <tbody>
           {data.map((book, index) => (
-            <tr key={index}>
+            <tr key={book._id || index}>
               <td>{index + 1}</td> {/* Numbering from 1 to 10 */}
               <td>{book.title}</td>
               <td>{book.author}</td>
               <td>{book.avgRating.toFixed(2)}</td>
-              <td>{book.highestRatedReview}</td>
-              <td>{book.lowestRatedReview}</td>
+              <td>{book.highestRatedReview || 'No review available'}</td>
+              <td>{book.lowestRatedReview || 'No review available'}</td>
             </tr>
           ))}
         </tbody>
@@ -56,4 +56,4 @@ const TopBooksView = () => {
   );
 };
 
-export default TopBooksView;
+export default TopRatedBooks;
