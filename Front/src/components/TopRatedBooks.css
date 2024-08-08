@@ -1,40 +1,76 @@
-/* TopBooksView.css */
+.search-books-container {
+  margin: 20px;
+  font-family: Arial, sans-serif;
+}
 
-.top-books-container {
-    padding: 20px;
-  }
-  
-  .loading, .error {
-    font-size: 18px;
-    color: #333;
-  }
-  
-  .top-books-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
-  
-  .top-books-table th, .top-books-table td {
-    border: 1px solid #ddd;
-    padding: 12px;
-    text-align: left;
-  }
-  
-  .top-books-table th {
-    background-color: #f4f4f4;
-    font-weight: bold;
-  }
-  
-  .top-books-table tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-  
-  .top-books-table tr:hover {
-    background-color: #eaeaea;
-  }
-  
-  .top-books-table td {
-    word-wrap: break-word;
-  }
-  
+.search-input {
+  padding: 10px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 300px;
+}
+
+.search-button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.search-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.error-text {
+  color: red;
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.results-table th,
+.results-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.results-table th {
+  background-color: #f2f2f2;
+  text-align: left;
+}
+
+.results-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.results-table tr:hover {
+  background-color: #ddd;
+}
+
+.pagination {
+  margin-top: 20px;
+}
+
+.pagination button {
+  padding: 8px 16px;
+  margin: 0 4px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.pagination button:hover:not(.active) {
+  background-color: #ddd;
+}
