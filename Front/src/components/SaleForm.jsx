@@ -17,10 +17,11 @@ const SaleForm = ({ fetchSales, editingSale, clearEditing }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const saleData = { book, year, sales };
-
+  
     try {
       if (editingSale) {
-        await axios.put(`http://localhost:5000/api/sales/${editingSale.id}`, saleData);
+        // Usa `_id` en lugar de `id` si tu backend espera `_id`
+        await axios.put(`http://localhost:5000/api/sales/${editingSale._id}`, saleData);
       } else {
         await axios.post('http://localhost:5000/api/sales', saleData);
       }
@@ -30,7 +31,7 @@ const SaleForm = ({ fetchSales, editingSale, clearEditing }) => {
       console.error('Error:', error);
     }
   };
-
+  
   const clearForm = () => {
     setBook('');
     setYear('');
