@@ -1,3 +1,4 @@
+// src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Authors from './pages/Authors';
@@ -6,6 +7,7 @@ import Reviews from './pages/Reviews';
 import Sales from './pages/Sales';
 import AggregatedData from './pages/AggregatedData';
 import TopRatedBooks from './pages/TopRatedBooks';
+import SearchBooks from './pages/SearchBooks';
 import './index.css';
 
 const App = () => {
@@ -20,8 +22,9 @@ const App = () => {
               <li><Link to="/books">Books</Link></li>
               <li><Link to="/reviews">Reviews</Link></li>
               <li><Link to="/sales">Sales</Link></li>
-              <li><Link to="/aggregated-data">Aggregated Data</Link></li>
-              <li><Link to="/top-rated-books">Top Rated Books</Link></li>
+              <li><Link to="/aggregated-data">Author Metrics</Link></li>
+              <li><Link to="/top-rated-books">Top 10 Rated Books</Link></li>
+              <li><Link to="/search-books">Search Books</Link></li>
             </ul>
           </nav>
         </header>
@@ -33,6 +36,7 @@ const App = () => {
             <Route path="/sales" element={<Sales />} />
             <Route path="/aggregated-data" element={<AggregatedData />} />
             <Route path="/top-rated-books" element={<TopRatedBooks />} />
+            <Route path="/search-books" element={<SearchBooks />} />
           </Routes>
         </main>
       </div>
