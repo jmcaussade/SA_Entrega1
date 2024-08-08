@@ -20,7 +20,7 @@ const SaleForm = ({ fetchSales, editingSale, clearEditing }) => {
 
     try {
       if (editingSale) {
-        await axios.put(`http://localhost:5000/api/sales/${editingSale.id}`, saleData);
+        await axios.put(`http://localhost:5000/api/sales/${editingSale._id}`, saleData);
       } else {
         await axios.post('http://localhost:5000/api/sales', saleData);
       }
