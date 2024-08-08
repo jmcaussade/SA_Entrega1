@@ -9,27 +9,24 @@ const SearchBooks = () => {
 
   const handleSearch = async () => {
     if (!searchTerm.trim()) {
-      setResults([]); // Clear results if search term is empty
+      setResults([]);
       return;
     }
     setLoading(true);
     setError('');
     try {
-      const response = await axios.get(`http://localhost:5000/api/search-books`, {
+      const response = await axios.get('http://localhost:5000/api/search-books', {
         params: { query: searchTerm },
       });
-      console.log('Search results:', response.data); // Log results
       if (Array.isArray(response.data)) {
         setResults(response.data);
       } else {
         setResults([]);
         setError('Unexpected response format');
-        console.error('Unexpected response format:', response.data);
       }
     } catch (error) {
-      console.error('Error fetching search results:', error);
       setError('Error fetching search results');
-      setResults([]); // Clear results on error
+      setResults([]);
     } finally {
       setLoading(false);
     }
@@ -60,9 +57,9 @@ const SearchBooks = () => {
           <tbody>
             {results.map((book) => (
               <tr key={book._id}>
-                <td>{book.title}</td>
+                <td>{book.name}</td>
                 <td>{book.author}</td>
-                <td>{book.description}</td>
+                <td>{book.summary}</td>
               </tr>
             ))}
           </tbody>

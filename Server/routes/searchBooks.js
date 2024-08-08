@@ -11,8 +11,9 @@ router.get('/', async (req, res) => {
     const books = await db.list({ include_docs: true });
     const bookDocs = books.rows.filter(row => row.doc.type === 'book').map(row => row.doc);
 
-    const results = bookDocs.filter(book =>
-      book.description.toLowerCase().includes(query.toLowerCase())
+    // Ensure that `summary` exists and filter based on it
+    const results = bookDocs.filter(book => 
+      book.summary && book.summary.toLowerCase().includes(query.toLowerCase())
     );
 
     res.json(results);
