@@ -3,7 +3,8 @@ const db = nano.use('bookstore');
 
 exports.createSale = async (req, res) => {
   try {
-    const result = await db.insert(req.body);
+    const sale = { ...req.body, type: 'sale' };
+    const result = await db.insert(sale);
     res.status(201).json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });

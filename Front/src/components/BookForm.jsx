@@ -7,6 +7,7 @@ const BookForm = ({ fetchBooks, editingBook, clearEditing }) => {
   const [dateOfPublication, setDateOfPublication] = useState('');
   const [numberOfSales, setNumberOfSales] = useState('');
   const [author, setAuthor] = useState('');
+  const [type, setType] = useState('book');
 
   useEffect(() => {
     if (editingBook) {
@@ -15,16 +16,25 @@ const BookForm = ({ fetchBooks, editingBook, clearEditing }) => {
       setDateOfPublication(editingBook.date_of_publication);
       setNumberOfSales(editingBook.number_of_sales);
       setAuthor(editingBook.author);
+      setType('book');
     }
   }, [editingBook]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const bookData = { name, summary, date_of_publication: dateOfPublication, number_of_sales: numberOfSales, author };
+    const bookData = {
+      name,
+      summary,
+      date_of_publication: dateOfPublication,
+      number_of_sales: numberOfSales,
+      author,
+      type: 'book'
+    };
 
     try {
       if (editingBook) {
-        await axios.put(`http://localhost:5000/api/books/${editingBook.id}`, bookData);
+        // Use `_id` if your backend expects `_id`
+        await axios.put(`http://localhost:5000/api/books/${editingBook._id}`, bookData);
       } else {
         await axios.post('http://localhost:5000/api/books', bookData);
       }
@@ -41,7 +51,8 @@ const BookForm = ({ fetchBooks, editingBook, clearEditing }) => {
     setDateOfPublication('');
     setNumberOfSales('');
     setAuthor('');
-    clearEditing();
+    setType('book'); // Reset the type to 'book'
+    clearEditing('');
   };
 
   return (

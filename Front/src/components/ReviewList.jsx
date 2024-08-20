@@ -55,7 +55,7 @@ const ReviewList = () => {
             <p>Score: {review.score}</p>
             <p>Number of Upvotes: {review.number_of_upvotes}</p>
             <button onClick={() => editReview(review)}>Edit</button>
-            <button onClick={() => deleteReview(review.id)}>Delete</button>
+            <button onClick={() => deleteReview(review._id)}>Delete</button>
           </li>
         ))}
       </ul>

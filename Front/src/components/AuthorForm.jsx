@@ -2,16 +2,27 @@ import React, { useState, useEffect } from 'react';
 
 const AuthorForm = ({ fetchAuthors, editingAuthor, clearEditing }) => {
   const [name, setName] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [countryOfOrigin, setCountryOfOrigin] = useState('');
+  const [description, setDescription] = useState('');
 
   useEffect(() => {
     if (editingAuthor) {
       setName(editingAuthor.name);
+      setDateOfBirth(editingAuthor.date_of_birth);
+      setCountryOfOrigin(editingAuthor.country_of_origin);
+      setDescription(editingAuthor.description);
     }
   }, [editingAuthor]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const authorData = { name };
+    const authorData = { 
+      name, 
+      date_of_birth: dateOfBirth, 
+      country_of_origin: countryOfOrigin, 
+      description 
+    };
 
     try {
       if (editingAuthor) {
@@ -28,7 +39,7 @@ const AuthorForm = ({ fetchAuthors, editingAuthor, clearEditing }) => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(authorData),
+          body: JSON.stringify({ type: 'author', ...authorData }),
         });
       }
 
@@ -41,6 +52,9 @@ const AuthorForm = ({ fetchAuthors, editingAuthor, clearEditing }) => {
 
   const clearForm = () => {
     setName('');
+    setDateOfBirth('');
+    setCountryOfOrigin('');
+    setDescription('');
     clearEditing();
   };
 
@@ -55,6 +69,31 @@ const AuthorForm = ({ fetchAuthors, editingAuthor, clearEditing }) => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
+          />
+        </label>
+        <label>
+          Date of Birth:
+          <input
+            type="date"
+            value={dateOfBirth}
+            onChange={(e) => setDateOfBirth(e.target.value)}
+            required
+          />
+        </label>
+        <label>
+          Country of Origin:
+          <input
+            type="text"
+            value={countryOfOrigin}
+            onChange={(e) => setCountryOfOrigin(e.target.value)}
+            required
+          />
+        </label>
+        <label>
+          Description:
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
           />
         </label>
         <button type="submit">{editingAuthor ? 'Update' : 'Add'}</button>

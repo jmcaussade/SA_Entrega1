@@ -11,16 +11,23 @@ exports.createBook = async (req, res) => {
   }
 };
 
+
 // Obtener todos los libros
 exports.getBooks = async (req, res) => {
   try {
     const result = await db.list({ include_docs: true });
-    const books = result.rows.filter(row => row.doc.type === 'book').map(row => row.doc);
+    const books = result.rows
+      .filter(row => row.doc.type === 'book')
+      .map(row => ({
+        id: row.id, // Aquí asegúrate de mapear el ID correctamente
+        ...row.doc,
+      }));
     res.status(200).json(books);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 // Obtener un libro por ID
 exports.getBookById = async (req, res) => {
