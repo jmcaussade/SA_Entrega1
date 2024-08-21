@@ -1,5 +1,5 @@
 # Usa una imagen oficial de Node.js como base
-FROM node:14
+FROM node:22 AS build
 
 # Establece el directorio de trabajo en el contenedor
 WORKDIR /app
@@ -13,17 +13,8 @@ RUN npm install
 # Copia el resto del código de la aplicación
 COPY . .
 
+# Expone el puerto 5173
+EXPOSE 5173
+
 # Construye el frontend
-RUN npm run build
-
-# Usa una imagen Nginx para servir los archivos estáticos
-FROM nginx:alpine
-
-# Copia los archivos estáticos construidos por Vite
-COPY --from=0 /app/dist /usr/share/nginx/html
-
-# Expone el puerto 80
-EXPOSE 80
-
-# Comando para iniciar Nginx
-CMD ["nginx", "-g", "daemon off;"]
+CMD [ "npm", "run", "dev" ]

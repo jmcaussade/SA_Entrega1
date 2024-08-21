@@ -8,7 +8,7 @@ services:
       - "5984:5984"
     environment:
       - COUCHDB_USER=admin
-      - COUCHDB_PASSWORD=password
+      - COUCHDB_PASSWORD=admin
     volumes:
       - couchdb_data:/opt/couchdb/data
 
@@ -18,7 +18,7 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - COUCHDB_URL=http://admin:password@couchdb:5984
+      - COUCHDB_URL=http://admin:admin@couchdb:5984
     depends_on:
       - couchdb
 
@@ -26,7 +26,7 @@ services:
     build: ./front
     container_name: frontend
     ports:
-      - "3000:80"
+      - "3000:5173"
     depends_on:
       - backend
 

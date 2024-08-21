@@ -10,7 +10,7 @@ const SaleList = () => {
 
   const fetchSales = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/sales');
+      const response = await axios.get('http://backend:5000/api/sales');
       setSales(response.data);
     } catch (err) {
       setError(err.message);
@@ -25,7 +25,7 @@ const SaleList = () => {
 
   const deleteSale = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/sales/${id}`);
+      await axios.delete(`http://backend:5000/api/sales/${id}`);
       fetchSales();
     } catch (error) {
       setError(error.message);

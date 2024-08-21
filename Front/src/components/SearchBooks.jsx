@@ -19,7 +19,7 @@ const SearchBooks = () => {
     setError('');
     setCurrentPage(1); // Reset to first page on new search
     try {
-      const response = await axios.get('http://localhost:5000/api/search-books', {
+      const response = await axios.get('http://backend:5000/api/search-books', {
         params: { query: searchTerm },
       });
       if (Array.isArray(response.data)) {

@@ -12,7 +12,7 @@ const AuthorList = () => {
 
   const fetchAuthors = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/authors');
+      const response = await fetch('http://backend:5000/api/authors');
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -25,7 +25,7 @@ const AuthorList = () => {
 
   const deleteAuthor = async (id) => {
     try {
-      await fetch(`http://localhost:5000/api/authors/${id}`, {
+      await fetch(`http://backend:5000/api/authors/${id}`, {
         method: 'DELETE',
       });
       fetchAuthors();

@@ -1,4 +1,4 @@
-const nano = require('nano')('http://admin:admin@127.0.0.1:5984'); // Reemplaza admin:admin con tu usuario y contraseña
+const nano = require('nano')('http://admin:admin@couchdb:5984'); // Reemplaza admin:admin con tu usuario y contraseña
 const { faker } = require('@faker-js/faker'); // Usa @faker-js/faker
 
 const dbName = 'bookstore';

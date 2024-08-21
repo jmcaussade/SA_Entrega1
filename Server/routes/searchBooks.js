@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const nano = require('nano')('http://admin:admin@127.0.0.1:5984');
+const nano = require('nano')('http://admin:admin@couchdb:5984');
 const db = nano.use('bookstore');
 
 router.get('/', async (req, res) => {

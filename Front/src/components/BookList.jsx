@@ -16,7 +16,7 @@ const BookList = () => {
 
   const fetchBooks = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/books');
+      const response = await axios.get('http://backend:5000/api/books');
       setBooks(response.data);
       setLoading(false);
     } catch (error) {
@@ -27,7 +27,7 @@ const BookList = () => {
 
   const fetchAuthors = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/authors');
+      const response = await axios.get('http://backend:5000/api/authors');
       const authorsData = response.data;
       // Create a mapping from author ID to author name
       const authorsMap = authorsData.reduce((acc, author) => {
@@ -42,7 +42,7 @@ const BookList = () => {
 
   const deleteBook = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/books/${id}`);
+      await axios.delete(`http://backend:5000/api/books/${id}`);
       fetchBooks();
     } catch (error) {
       setError(error.message);
