@@ -107,3 +107,16 @@ Si ves un error de red en el frontend, verifica que el servidor backend esté co
 ## Error "No routes matched location"
 Este error indica que no se ha definido una ruta correspondiente en el frontend. Asegúrate de que los componentes de las rutas existan y estén correctamente importados.
 
+# Dockerisación
+
+Para dockerizar el proyecto correctamente se deben correr los siguientes comandos desde la carpeta raiz (SA_Entrega1).
+
+* docker-compose build
+* docker-compose up
+
+Finalmente, para poblar la base de datos del contenedor solo hay que ejecutar los siguientes comandos desde la carpeta raiz (fuera del contenedor):
+
+```bash
+cd ../server
+node scripts/populateDatabase.js
+```
