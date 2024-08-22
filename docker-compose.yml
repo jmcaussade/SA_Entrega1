@@ -13,7 +13,7 @@ services:
       - couchdb_data:/opt/couchdb/data
 
   backend:
-    build: ./server
+    build: ./Server
     container_name: backend
     ports:
       - "5000:5000"
@@ -23,10 +23,10 @@ services:
       - couchdb
 
   frontend:
-    build: ./front
+    build: ./Front
     container_name: frontend
     ports:
-      - "3000:5173"
+      - "5173:5173"
     depends_on:
       - backend
 
