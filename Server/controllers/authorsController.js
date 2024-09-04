@@ -4,7 +4,7 @@ const db = nano.use('bookstore');
 const fetchAuthors = async (redisClient, req, res) => {
   const useCache = process.env.USE_CACHE === 'true';
   console.log('USE_CACHE:', process.env.USE_CACHE); // Log the value of USE_CACHE
-  console.log('useCache:', useCache); // Log the value of useCache
+  //console.log('useCache:', useCache); // Log the value of useCache
   const cacheKey = 'authors';
 
   if (useCache) {
@@ -16,13 +16,13 @@ const fetchAuthors = async (redisClient, req, res) => {
       if (data) {
         console.log('Fetching authors from cache');
         const authors = JSON.parse(data);
-        console.log('Authors from cache:', authors); // Log the authors data from cache
+        //console.log('Authors from cache:', authors); // Log the authors data from cache
         return res.json(authors);
       } else {
         console.log('Cache miss. Fetching authors from database');
         const result = await db.list({ include_docs: true });
         const authors = result.rows.filter(row => row.doc.type === 'author').map(row => row.doc);
-        console.log('Authors from database:', authors); // Log the authors data from database
+        //console.log('Authors from database:', authors); // Log the authors data from database
         await redisClient.setEx(cacheKey, 3600, JSON.stringify(authors));
         return res.json(authors);
       }
@@ -35,7 +35,7 @@ const fetchAuthors = async (redisClient, req, res) => {
     try {
       const result = await db.list({ include_docs: true });
       const authors = result.rows.filter(row => row.doc.type === 'author').map(row => row.doc);
-      console.log('Authors from database:', authors); // Log the authors data from database
+      //console.log('Authors from database:', authors); // Log the authors data from database
       return res.json(authors);
     } catch (dbError) {
       console.error('Error fetching authors from database:', dbError);
@@ -111,19 +111,28 @@ const updateAuthor = async (redisClient, authorId, authorData) => {
   }
 };
 
-const deleteAuthor = async (redisClient, authorId) => {
+const deleteAuthor = async (redisClient, req, res) => {
   const useCache = process.env.USE_CACHE === 'true';
-
+  console.log("dentro delete method author controller")
   try {
-    const result = await db.remove(authorId);
+    // Fetch the document to get its revision (_rev)
+    const author = await db.get(req.params.id);
+
+    // Delete the document from CouchDB
+    await db.destroy(author._id, author._rev);
+
     if (useCache) {
-      console.log(`Invalidating cache for author ${authorId} and authors list`);
-      redisClient.del(`author:${authorId}`);
-      redisClient.del('authors');
+      // Invalidate cache for the deleted author and the authors list
+      console.log(`Invalidating cache for author ${req.params.id} and authors list`);
+      redisClient.del('authors'); // Invalidate the authors list cache
+      await redisClient.del(`author:${req.params.id}`);
+      await redisClient.del('authors');
     }
-    return result;
+
+    res.status(204).end(); // Respond with no content after successful deletion
   } catch (error) {
-    throw error;
+    console.error(`Error deleting author with ID ${req.params.id}:`, error);
+    res.status(500).json({ error: error.message });
   }
 };
 
