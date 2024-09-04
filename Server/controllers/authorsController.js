@@ -80,21 +80,30 @@ const fetchAuthorById = async (redisClient, authorId) => {
   }
 };
 
-const createAuthor = async (redisClient, authorData) => {
-  const useCache = process.env.USE_CACHE === 'true';
-
+const createAuthor = async (redisClient, req, res) => {
+  console.log("dentro create method author controller")
   try {
-    const result = await db.insert(authorData);
-    if (useCache) {
-      console.log('Invalidating authors cache');
-      redisClient.del('authors');
+    // Create the new author in CouchDB
+    const result = await db.insert(req.body);
+    console.log('CouchDB create result:', result);
+
+    if (process.env.USE_CACHE === 'true') {
+      // Invalidate the cache for the authors list
+      console.log('Invalidating cache for authors list');
+      await redisClient.del('authors');
+
+      // Cache the newly created author data
+      const newAuthorId = result.id;
+      const cacheData = { ...req.body, _id: newAuthorId };
+      await redisClient.setEx(`author:${newAuthorId}`, 3600, JSON.stringify(cacheData));
     }
-    return result;
+
+    res.status(201).json(result);
   } catch (error) {
-    throw error;
+    console.error('Error creating author:', error.message);
+    res.status(500).json({ error: error.message });
   }
 };
-
 const updateAuthor = async (redisClient, req, res) => {
   console.log("dentro update method author controller")
   const useCache = process.env.USE_CACHE === 'true';
