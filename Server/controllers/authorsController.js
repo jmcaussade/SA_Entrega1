@@ -95,21 +95,46 @@ const createAuthor = async (redisClient, authorData) => {
   }
 };
 
-const updateAuthor = async (redisClient, authorId, authorData) => {
+const updateAuthor = async (redisClient, req, res) => {
+  console.log("dentro update method author controller")
   const useCache = process.env.USE_CACHE === 'true';
+  const authorId = req.params.id; // Extract ID from request parameters
+  const authorData = req.body; // Extract data from request body
+
+  console.log('Update author called with ID:', authorId);
+  console.log('Incoming authorData:', authorData);
 
   try {
-    const result = await db.insert({ ...authorData, _id: authorId });
+    // Fetch the existing author document
+    const author = await db.get(authorId);
+    console.log('Fetched author from database:', author);
+
+    // Prepare updated data
+    const updatedAuthorData = { ...author, ...authorData, _id: authorId, _rev: author._rev };
+    console.log('Prepared updatedAuthorData:', updatedAuthorData);
+
+    // Update the author in CouchDB
+    const result = await db.insert(updatedAuthorData);
+    console.log('CouchDB update result:', result);
+
+    // Handle caching
     if (useCache) {
       console.log(`Invalidating cache for author ${authorId} and authors list`);
-      redisClient.del(`author:${authorId}`);
-      redisClient.del('authors');
+      await redisClient.del(`author:${authorId}`);
+      await redisClient.del('authors');
     }
-    return result;
+
+    // Respond with the result
+    res.status(200).json(result);
   } catch (error) {
-    throw error;
+    console.error('Error updating author:', error.message);
+    if (error.stack) {
+      console.error('Stack trace:', error.stack.split('\n').slice(0, 5).join('\n'));
+    }
+    res.status(500).json({ error: error.message });
   }
 };
+
 
 const deleteAuthor = async (redisClient, req, res) => {
   const useCache = process.env.USE_CACHE === 'true';
