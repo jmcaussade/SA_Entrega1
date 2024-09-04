@@ -1,3 +1,5 @@
+const { use } = require('../routes/books');
+
 const nano = require('nano')('http://admin:admin@127.0.0.1:5984');
 const db = nano.use('bookstore');
 
@@ -18,14 +20,43 @@ exports.createReview = async (req, res) => {
 };
 
 // Obtener todas las reseñas
-exports.getReviews = async (req, res) => {
-  try {
-    const result = await db.list({ include_docs: true });
-    const reviews = result.rows.filter(row => row.doc.type === 'review').map(row => row.doc);
-    res.status(200).json(reviews);
-  } catch (error) {
-    console.error("Error fetching reviews:", error); // Debugging
-    res.status(500).json({ error: error.message });
+exports.getReviews = async (redisClient, req, res) => {
+  console.log("dentro de getReviews"); // Debugging
+  const useCache = process.env.USE_CACHE === 'true';
+  console.log('USE_CACHE:', process.env.USE_CACHE); // Log the value of USE_CACHE
+  const cacheKey = 'reviews';
+
+  if (useCache) {
+    console.log('Attempting to fetch from cache');
+    try {
+      const cachedData = await redisClient.get(cacheKey);
+
+      if (cachedData) {
+        console.log('Fetching reviews from cache');
+        const reviews = JSON.parse(cachedData);
+        return res.status(200).json(reviews);
+      } else {
+        console.log('Cache miss. Fetching reviews from database');
+        const result = await db.list({ include_docs: true });
+        const reviews = result.rows.filter(row => row.doc.type === 'review').map(row => row.doc);
+        // Store the fetched reviews in Redis cache for 1 hour (3600 seconds)
+        await redisClient.setEx(cacheKey, 3600, JSON.stringify(reviews));
+        return res.status(200).json(reviews);
+      }
+    } catch (err) {
+      console.error('Error fetching reviews from cache or database:', err);
+      return res.status(500).json({ error: 'Error fetching reviews' });
+    }
+  } else {
+    console.log('Fetching reviews from database (cache disabled)');
+    try {
+      const result = await db.list({ include_docs: true });
+      const reviews = result.rows.filter(row => row.doc.type === 'review').map(row => row.doc);
+      return res.status(200).json(reviews);
+    } catch (dbError) {
+      console.error('Error fetching reviews from database:', dbError);
+      return res.status(500).json({ error: 'Error fetching reviews from database' });
+    }
   }
 };
 
