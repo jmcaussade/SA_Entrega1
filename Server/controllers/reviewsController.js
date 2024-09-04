@@ -4,17 +4,34 @@ const nano = require('nano')('http://admin:admin@127.0.0.1:5984');
 const db = nano.use('bookstore');
 
 // Crear una reseña
-exports.createReview = async (req, res) => {
+exports.createReview = async (redisClient, req, res) => {
+  console.log("dentro de createReview"); // Debugging
+  const useCache = process.env.USE_CACHE === 'true';
   try {
     console.log("Request Body:", req.body); // Debugging
+
+    // Create the new review in CouchDB
     const review = {
       ...req.body,
       type: 'review',
     };
     const result = await db.insert(review);
+    console.log('CouchDB create result:', result);
+
+    if (useCache) {
+      // Invalidate the cache for the reviews list
+      console.log('Invalidating cache for reviews list');
+      await redisClient.del('reviews');
+
+      // Cache the newly created review data
+      const newReviewId = result.id;
+      const cacheData = { ...req.body, _id: newReviewId };
+      await redisClient.setEx(`review:${newReviewId}`, 3600, JSON.stringify(cacheData));
+    }
+
     res.status(201).json(result);
   } catch (error) {
-    console.error("Error creating review:", error); // Debugging
+    console.error('Error creating review:', error.message); // Debugging
     res.status(500).json({ error: error.message });
   }
 };
