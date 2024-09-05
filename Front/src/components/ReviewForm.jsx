@@ -22,8 +22,10 @@ const ReviewForm = ({ fetchReviews, editingReview, clearEditing }) => {
 
     try {
       if (editingReview) {
+        console.log(`Updating review at URL: http://localhost:5000/api/reviews/${editingReview._id}`);
         await axios.put(`http://localhost:5000/api/reviews/${editingReview._id}`, reviewData);
       } else {
+        console.log('Creating new review at URL: http://localhost:5000/api/reviews');
         await axios.post('http://localhost:5000/api/reviews', reviewData);
       }
       fetchReviews();

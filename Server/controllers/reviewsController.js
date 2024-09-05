@@ -92,18 +92,43 @@ exports.getReviewById = async (req, res) => {
   }
 };
 
-// Actualizar una reseña
-exports.updateReview = async (req, res) => {
+exports.updateReview = async (redisClient, req, res) => {
+  const useCache = process.env.USE_CACHE === 'true';
+  const reviewId = req.params.id; // Extract the review ID from request parameters
+
+  console.log('dentro updateReview');
+  console.log('Request Params:', req.params);
+  console.log('Review ID:', reviewId);
+
   try {
-    const review = await db.get(req.params.id);
+    // Fetch the current review from the database
+    const review = await db.get(reviewId);
+
+    // Merge the existing review with the updated data
     const updatedReview = { ...review, ...req.body };
+
+    // Update the review in the database
     const result = await db.insert(updatedReview);
     res.status(200).json(result);
+
+    if (useCache) {
+      // Invalidate the cache for the updated review
+      console.log('Invalidating cache for review:', reviewId);
+      await redisClient.del(`review:${reviewId}`);
+
+      // Optionally, invalidate the cache for the entire reviews list
+      console.log('Invalidating cache for all reviews');
+      await redisClient.del('reviews');
+
+      // Cache the updated review data
+      await redisClient.setEx(`review:${reviewId}`, 3600, JSON.stringify(updatedReview));
+    }
   } catch (error) {
-    console.error("Error updating review:", error); // Debugging
+    console.error('Error updating review:', error); // Debugging
     res.status(500).json({ error: error.message });
   }
 };
+
 
 // Eliminar una reseña
 exports.deleteReview = async (req, res) => {
