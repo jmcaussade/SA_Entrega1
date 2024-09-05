@@ -131,12 +131,32 @@ exports.updateReview = async (redisClient, req, res) => {
 
 
 // Eliminar una reseña
-exports.deleteReview = async (req, res) => {
+exports.deleteReview = async (redisClient, req, res) => {
+  const useCache = process.env.USE_CACHE === 'true';
+  console.log('dentro deleteReview');
+  
   try {
     const review = await db.get(req.params.id);
+  
+    console.log('Review from request Params:', review);
+
+    console.log("ID review to delete: ", review._id)
+    console.log("REV review to delete: ", review._rev)
     await db.destroy(review._id, review._rev);
+
+    if (useCache) {
+      // Invalidate the cache for the deleted review
+      console.log('Invalidating cache for review:', review._id);
+      await redisClient.del(`review:${review._id}`);
+
+      // Optionally, invalidate the cache for the entire reviews list
+      console.log('Invalidating cache for all reviews');
+      await redisClient.del('reviews');
+    }
+
     res.status(204).end();
   } catch (error) {
+    console.error(`Error deleting review with ID ${review._id}:`, error);
     res.status(500).json({ error: error.message });
   }
 };

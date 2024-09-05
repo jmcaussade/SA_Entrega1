@@ -153,6 +153,8 @@ const deleteAuthor = async (redisClient, req, res) => {
     const author = await db.get(req.params.id);
 
     // Delete the document from CouchDB
+    console.log("author ID: ", author._id)
+    console.log("author REV: ", author._rev)
     await db.destroy(author._id, author._rev);
 
     if (useCache) {
