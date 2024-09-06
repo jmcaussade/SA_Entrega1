@@ -37,17 +37,42 @@ exports.createBook = async (redisClient, req, res) => {
 
 
 // Obtener todos los libros
-exports.getBooks = async (req, res) => {
+exports.getBooks = async (redisClient, req, res) => {
+  console.log("dentro de getBooks"); // Debugging
+  const useCache = process.env.USE_CACHE === 'true';
+  console.log('USE_CACHE:', process.env.USE_CACHE); // Log the value of USE_CACHE
+  const cacheKey = 'books';
+
   try {
-    const result = await db.list({ include_docs: true });
-    const books = result.rows
-      .filter(row => row.doc.type === 'book')
-      .map(row => ({
-        id: row.id, // Aquí asegúrate de mapear el ID correctamente
-        ...row.doc,
-      }));
+    let books;
+    
+    if (useCache) {
+      console.log('Attempting to fetch from cache');
+      const cachedData = await redisClient.get(cacheKey);
+      //console.log('cachedData:', cachedData); // Debugging
+
+      if (cachedData) {
+        console.log('Fetching books from cache');
+        books = JSON.parse(cachedData);
+        //console.log('books:', books); // Debugging
+      } else {
+        console.log('Cache miss. Fetching books from database');
+        const result = await db.list({ include_docs: true });
+        books = result.rows.filter(row => row.doc.type === 'book').map(row => row.doc);
+        // Store the fetched books in Redis cache for 1 hour (3600 seconds)
+        await redisClient.setEx(cacheKey, 3600, JSON.stringify(books));
+      }
+    } else {
+      console.log('Fetching books from database (cache disabled)');
+      const result = await db.list({ include_docs: true });
+      books = result.rows.filter(row => row.doc.type === 'book').map(row => row.doc);
+    }
+    
+    // Send the response once
     res.status(200).json(books);
+
   } catch (error) {
+    console.log("Error fetching books:", error.message); // Debugging
     res.status(500).json({ error: error.message });
   }
 };
