@@ -2,11 +2,35 @@ const nano = require('nano')('http://admin:admin@127.0.0.1:5984');
 const db = nano.use('bookstore');
 
 // Crear un libro
-exports.createBook = async (req, res) => {
+exports.createBook = async (redisClient, req, res) => {
+  console.log("dentro de createBook"); // Debugging
+  const useCache = process.env.USE_CACHE === 'true';
   try {
-    const result = await db.insert(req.body);
+    console.log("Request Body:", req.body); // Debugging
+
+    const book = {
+      ...req.body,
+      type: 'book',
+
+    };
+
+    const result = await db.insert(book);
+    console.log('CouchDB create result:', result);
+
+    if (useCache) {
+      // Invalidate the cache for the books list
+      console.log('Invalidating cache for books list');
+      await redisClient.del('books');
+
+      // Cache the newly created book data
+      const newBookId = result.id;
+      const cacheData = { ...req.body, _id: newBookId };
+      await redisClient.setEx(`book:${newBookId}`, 3600, JSON.stringify(cacheData));
+    }
+
     res.status(201).json(result);
   } catch (error) {
+    console.log("Error creating book:", error.message); // Debugging
     res.status(500).json({ error: error.message });
   }
 };
