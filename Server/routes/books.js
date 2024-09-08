@@ -7,7 +7,7 @@ module.exports = (redisClient) => {
     router.get('/', (req, res) => booksController.getBooks(redisClient, req, res));
     router.get('/:id', booksController.getBookById);
     router.put('/:id', (req, res) =>  booksController.updateBook(redisClient, req, res));
-    router.delete('/:id', booksController.deleteBook);
+    router.delete('/:id', (req, res) => booksController.deleteBook(redisClient, req, res));
 
     return router;
 

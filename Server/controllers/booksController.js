@@ -130,13 +130,29 @@ exports.updateBook = async (redisClient, req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 // Eliminar un libro
-exports.deleteBook = async (req, res) => {
+exports.deleteBook = async (redisClient, req, res) => {
+  console.log("dentro de deleteBook"); // Debugging
+  const useCache = process.env.USE_CACHE === 'true';
+
   try {
     const book = await db.get(req.params.id);
+    console.log("Book to delete:", book); // Debugging
     await db.destroy(book._id, book._rev);
+
+    if (useCache) {
+      console.log('Invalidating cache for the book:', book._id);
+      await redisClient.del(`book:${book._id}`);
+
+      //Invalidating cache for the hole books list
+      console.log('Invalidating cache for all books');
+      await redisClient.del('books');
+    }
+
     res.status(204).end();
   } catch (error) {
+    console.log("Error deleting book"); // Debugging
     res.status(500).json({ error: error.message });
   }
 };
