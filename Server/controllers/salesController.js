@@ -76,16 +76,48 @@ exports.getSaleById = async (req, res) => {
   }
 };
 
-exports.updateSale = async (req, res) => {
+exports.updateSale = async (redisClient, req, res) => {
+  console.log("dentro de updateSale"); // Debugging
+  const useCache = process.env.USE_CACHE === 'true';
+
   try {
+    // Fetch the current sale from the database
     const sale = await db.get(req.params.id);
+
+    // Merge the existing sale with the updated data
     const updatedSale = { ...sale, ...req.body };
+
+    // Update the sale in the database
     const result = await db.insert(updatedSale);
+    console.log('CouchDB update sale result:', result);
+
+    // Send the response to the client
     res.status(200).json(result);
+
+    if (useCache) {
+      // Ensure cache invalidation and update only if the response has not been sent
+      console.log("invalidating cache for sale:", sale._id);
+      await redisClient.del(`sale:${sale._id}`);
+
+      // Invalidate the cache for the sales list
+      console.log('Invalidating cache for sales list');
+      await redisClient.del('sales');
+
+      // Cache the updated sale data
+      console.log('Caching updated sale data');
+      await redisClient.setEx(`sale:${req.params.id}`, 3600, JSON.stringify(updatedSale));
+    }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    if (!res.headersSent) {
+      // Ensure headers have not been sent before sending an error response
+      res.status(500).json({ error: error.message });
+    } else {
+      // Log error if response headers have already been sent
+      console.error('Error during updateSale after response sent:', error);
+    }
   }
 };
+
 
 exports.deleteSale = async (req, res) => {
   try {
