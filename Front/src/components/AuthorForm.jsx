@@ -26,7 +26,7 @@ const AuthorForm = ({ fetchAuthors, editingAuthor, clearEditing }) => {
 
     try {
       if (editingAuthor) {
-        await fetch(`http://backend:5000/api/authors/${editingAuthor._id}`, {
+        await fetch(`http://miapp.localhost:5000/api/authors/${editingAuthor._id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -34,7 +34,7 @@ const AuthorForm = ({ fetchAuthors, editingAuthor, clearEditing }) => {
           body: JSON.stringify({ ...authorData, _rev: editingAuthor._rev }),
         });
       } else {
-        await fetch('http://backend:5000/api/authors', {
+        await fetch('http://miapp.localhost:5000/api/authors', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -34,9 +34,9 @@ const BookForm = ({ fetchBooks, editingBook, clearEditing }) => {
     try {
       if (editingBook) {
         // Use `_id` if your backend expects `_id`
-        await axios.put(`http://backend:5000/api/books/${editingBook._id}`, bookData);
+        await axios.put(`http://miapp.localhost:5000/api/books/${editingBook._id}`, bookData);
       } else {
-        await axios.post('http://backend:5000/api/books', bookData);
+        await axios.post('http://miapp.localhost:5000/api/books', bookData);
       }
       fetchBooks();
       clearForm();

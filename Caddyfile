@@ -1,0 +1,7 @@
+miapp.localhost {
+    reverse_proxy frontend:5173
+}
+
+miapp.localhost/api/* {
+    reverse_proxy backend:5000
+}
