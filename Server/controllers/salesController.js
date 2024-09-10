@@ -119,12 +119,25 @@ exports.updateSale = async (redisClient, req, res) => {
 };
 
 
-exports.deleteSale = async (req, res) => {
+exports.deleteSale = async (redisClient, req, res) => {
+  console.log("dentro de deleteSale"); // Debugging
+  const useCache = process.env.USE_CACHE === 'true';
+
   try {
     const sale = await db.get(req.params.id);
     await db.destroy(sale._id, sale._rev);
+
+    if (useCache) {
+      console.log('Invalidating cache for the sale:', sale._id);
+      await redisClient.del(`sale:${sale._id}`);
+
+      // Optionally invalidate the cache for the entire sales list
+      console.log('Invalidating cache for all sales');
+      await redisClient.del('sales');
+    }
     res.status(204).end();
   } catch (error) {
+    console.log("Error deleting sale"); // Debugging
     res.status(500).json({ error: error.message });
   }
 };
