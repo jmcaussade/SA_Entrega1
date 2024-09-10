@@ -25,7 +25,8 @@ const ReviewList = () => {
 
   const deleteReview = async (id) => {
     try {
-      await axios.delete(`http://miapp.localhost:5000/api/reviews/${id}`);
+      console.log(`Deleting review at URL: http://localhost:5000/api/reviews/${id}`);
+      await axios.delete(`http://localhost:5000/api/reviews/${id}`);
       fetchReviews();
     } catch (error) {
       setError(error.message);
