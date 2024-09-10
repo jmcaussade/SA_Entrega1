@@ -22,9 +22,9 @@ const ReviewForm = ({ fetchReviews, editingReview, clearEditing }) => {
 
     try {
       if (editingReview) {
-        await axios.put(`http://backend:5000/api/reviews/${editingReview._id}`, reviewData);
+        await axios.put(`http://miapp.localhost:5000/api/reviews/${editingReview._id}`, reviewData);
       } else {
-        await axios.post('http://backend:5000/api/reviews', reviewData);
+        await axios.post('http://miapp.localhost:5000/api/reviews', reviewData);
       }
       fetchReviews();
       clearForm();

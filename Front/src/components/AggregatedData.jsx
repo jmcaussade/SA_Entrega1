@@ -23,7 +23,7 @@ const AggregatedDataView = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://backend:5000/api/aggregated-data');
+        const response = await axios.get('http://miapp.localhost:5000/api/aggregated-data');
         setData(response.data);
       } catch (err) {
         setError(err.message);

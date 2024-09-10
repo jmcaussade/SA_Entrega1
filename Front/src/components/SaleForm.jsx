@@ -20,9 +20,9 @@ const SaleForm = ({ fetchSales, editingSale, clearEditing }) => {
 
     try {
       if (editingSale) {
-        await axios.put(`http://backend:5000/api/sales/${editingSale._id}`, saleData);
+        await axios.put(`http://miapp.localhost:5000/api/sales/${editingSale._id}`, saleData);
       } else {
-        await axios.post('http://backend:5000/api/sales', saleData);
+        await axios.post('http://miapp.localhost:5000/api/sales', saleData);
       }
       fetchSales();
       clearForm();

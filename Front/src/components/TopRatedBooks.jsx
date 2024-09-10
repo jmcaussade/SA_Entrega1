@@ -10,7 +10,7 @@ const TopRatedBooks = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://backend:5000/api/top-books');
+        const response = await axios.get('http://miapp.localhost:5000/api/top-books');
         setData(response.data);
       } catch (err) {
         setError(err.message);

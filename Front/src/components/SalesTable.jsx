@@ -11,7 +11,7 @@ const SalesTable = () => {
 
   const fetchTopSellingBooks = async () => {
     try {
-      const response = await axios.get('http://backend:5000/api/top-sales');
+      const response = await axios.get('http://miapp.localhost:5000/api/top-sales');
       setBooks(response.data);
     } catch (error) {
       console.error('Error fetching top selling books:', error);

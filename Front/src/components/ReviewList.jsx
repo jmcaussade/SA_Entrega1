@@ -14,7 +14,7 @@ const ReviewList = () => {
 
   const fetchReviews = async () => {
     try {
-      const response = await axios.get('http://backend:5000/api/reviews');
+      const response = await axios.get('http://miapp.localhost:5000/api/reviews');
       setReviews(response.data);
       setLoading(false);
     } catch (error) {
@@ -25,7 +25,7 @@ const ReviewList = () => {
 
   const deleteReview = async (id) => {
     try {
-      await axios.delete(`http://backend:5000/api/reviews/${id}`);
+      await axios.delete(`http://miapp.localhost:5000/api/reviews/${id}`);
       fetchReviews();
     } catch (error) {
       setError(error.message);

@@ -30,5 +30,16 @@ services:
     depends_on:
       - backend
 
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    ports:
+      - "80:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    depends_on:
+      - frontend
+      - backend
+
 volumes:
   couchdb_data:
