@@ -4,6 +4,9 @@ FROM node:22
 # Establece el directorio de trabajo en el contenedor
 WORKDIR /app
 
+# Instala netcat-openbsd
+RUN apt-get update && apt-get install -y netcat-openbsd
+
 # Copia el package.json y el package-lock.json
 COPY package*.json ./
 
