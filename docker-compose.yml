@@ -19,8 +19,16 @@ services:
       - "5000:5000"
     environment:
       - COUCHDB_URL=http://admin:admin@couchdb:5984
+      - REDIS_URL=redis://redis:6379
     depends_on:
       - couchdb
+      - redis
+      
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
 
   frontend:
     build: ./Front

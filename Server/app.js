@@ -18,8 +18,9 @@ const topsalesRoutes = require('./routes/topsales');
 const app = express();
 const port = 5000;
 
-//Redis client
-const redisClient = redis.createClient();
+// Redis client
+const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+const redisClient = redis.createClient({ url: redisUrl });
 
 redisClient.on('error', (error) => {
   console.error('Error connecting to Redis:', error);
@@ -30,8 +31,13 @@ redisClient.on('ready', () => {
 });
 
 (async () => {
-  await redisClient.connect();
-  await redisClient.ping();
+  try {
+    await redisClient.connect();
+    await redisClient.ping();
+    console.log('Connected to Redis');
+  } catch (error) {
+    console.error('Failed to connect to Redis:', error);
+  }
 })();
 
 // Middleware to enable CORS

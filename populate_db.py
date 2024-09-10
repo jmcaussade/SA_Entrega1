@@ -5,7 +5,7 @@ from faker import Faker
 # Connect to CouchDB server with authentication
 username = 'admin'  # Replace with your CouchDB username
 password = 'admin'  # Replace with your CouchDB password
-couch = couchdb.Server(f'http://{username}:{password}@127.0.0.1:5984/')
+couch = couchdb.Server(f'http://{username}:{password}@miapp.localhost:5984/')
 
 # Create or use existing database
 db_name = 'bookstore'
