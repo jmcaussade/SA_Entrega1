@@ -1,28 +1,22 @@
 const express = require('express');
 const path = require('path');
-const bodyParser = require('body-parser');
 const cors = require("cors");
 
 const booksRoutes = require('./routes/books');
-const authorsRoutes = require('./routes/authors');
 const reviewsRoutes = require('./routes/reviews');
-const salesRoutes = require('./routes/sales');
-const aggregatedDataRoutes = require('./routes/aggregatedData');
-const topBooksRoutes = require('./routes/topBooks');
-const searchBooksRoutes = require('./routes/searchBooks')
-const topsalesRoutes = require('./routes/topsales')
-
-
+const searchBooksRoutes = require('./routes/searchBooks');
 
 const app = express();
 const port = 5000;
 
 // Middleware para habilitar CORS
 app.use(cors());
-app.use(express.json()); // Middleware para parsear JSON
+app.use(express.json());
 
-// Middleware para servir archivos estáticos
-app.use(express.static(path.join(__dirname, 'dist')));
+// Sirve archivos estáticos si no se está usando Caddy
+if (process.env.USE_CADDY !== 'true') {
+  app.use(express.static(path.join(__dirname, 'dist')));
+}
 
 // // Rutas de la API
 app.use('/api/authors', authorsRoutes);
@@ -43,5 +37,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(port,() => {
-  console.log(`Server is running on http://localhost${port}`);
+  console.log(`Server is running on http://localhost:${port}`);
 });

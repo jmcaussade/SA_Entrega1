@@ -1,5 +1,6 @@
 const nano = require('nano')('http://admin:admin@couchdb:5984');
 const db = nano.use('bookstore');
+const client = require('../utils/searchEngine');
 
 // Crear una reseña
 exports.createReview = async (req, res) => {

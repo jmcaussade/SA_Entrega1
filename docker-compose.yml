@@ -12,6 +12,18 @@ services:
     volumes:
       - couchdb_data:/opt/couchdb/data
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"  # Limitar la memoria usada por Elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+
   backend:
     build: ./server
     container_name: backend
@@ -19,16 +31,37 @@ services:
       - "5000:5000"
     environment:
       - COUCHDB_URL=http://admin:admin@couchdb:5984
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - USE_CADDY=true
     depends_on:
       - couchdb
+      - elasticsearch
 
   frontend:
     build: ./front
     container_name: frontend
-    ports:
-      - "3000:5173"
     depends_on:
       - backend
+    expose:
+      - "5173"
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    ports:
+      - "80:80"  # Exponer el puerto 80 para Caddy
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile  # Monta tu archivo Caddyfile en el contenedor
+      - ./front/dist:/srv                 # Monta la carpeta de archivos estáticos generados por Vite
+    depends_on:
+      - frontend
+    networks:
+      - webnet
 
 volumes:
   couchdb_data:
+  es_data:
+
+networks:
+  webnet:
+    driver: bridge
