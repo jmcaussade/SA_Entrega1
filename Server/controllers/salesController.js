@@ -33,27 +33,30 @@ exports.getSales = async (redisClient, req, res) => {
   console.log("dentro de getSales"); // Debugging
   const useCache = process.env.USE_CACHE === 'true';
   const cacheKey = 'sales';
+ 
+  let sales = [];  // Ensure sales is initialized as an empty array by default
 
   try {
     if (useCache) {
       console.log('Attempting to fetch from cache');
       const cachedData = await redisClient.get(cacheKey);
-      //console.log('cachedData:', cachedData); // Debugging
-
       if (cachedData) {
         console.log('Fetching sales from cache');
         sales = JSON.parse(cachedData);
-
       } else {
         console.log('Cache miss. Fetching sales from database');
         const result = await db.list({ include_docs: true });
-        const sales = result.rows.filter(row => row.doc.type === 'sale').map(row => row.doc);
+        sales = result.rows.filter(row => row.doc.type === 'sale').map(row => row.doc);
         await redisClient.setEx(cacheKey, 3600, JSON.stringify(sales));
-
       }
     } else {
-    const result = await db.list({ include_docs: true });
-    const sales = result.rows.filter(row => row.doc.type === 'sale').map(row => row.doc);
+      console.log('Fetching sales from database (cache disabled)');
+      const result = await db.list({ include_docs: true });
+      sales = result.rows.filter(row => row.doc.type === 'sale').map(row => row.doc);
+    }
+
+    if (!Array.isArray(sales)) {
+      sales = []; // Ensure sales is an array if some unexpected data was returned
     }
 
     res.status(200).json(sales);

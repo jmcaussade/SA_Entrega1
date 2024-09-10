@@ -12,9 +12,9 @@ const SaleList = () => {
     try {
       const response = await axios.get('http://localhost:5000/api/sales');
       setSales(response.data);
+      setLoading(false);
     } catch (err) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   };
