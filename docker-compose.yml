@@ -41,5 +41,13 @@ services:
       - frontend
       - backend
 
+  populate-db:
+    build:
+      context: ./Server
+    container_name: populate-db
+    entrypoint: ["node", "scripts/populateDatabase.js"]
+    depends_on:
+      - couchdb
+
 volumes:
   couchdb_data:
