@@ -56,11 +56,37 @@ exports.getAuthors = async (redisClient, req, res) => {
   }
 };
 
-exports.createAuthor = async (req, res) => {
+exports.createAuthor = async (redisClient, req, res) => {
+  console.log('Creating author...');
+  const useCache = process.env.USE_CACHE === 'true';
+
   try {
-    const result = await db.insert(req.body);
+    const authorData = {
+      type: 'author',
+      name: req.body.name,
+      date_of_birth: req.body.date_of_birth || '', // Default to empty string if not provided
+      country_of_origin: req.body.country_of_origin || '', // Default to empty string if not provided
+      description: req.body.description || '' // Default to empty string if not provided
+    };
+
+    console.log('Inserting author:', authorData);
+    const result = await db.insert(authorData);
+    console.log('Author result', result);
+
+    if (useCache) {
+      console.log('Clearing cache');
+      await redisClient.del('authors');
+
+      // Cache the newly created author data
+      console.log('Caching new author data');
+      const newAuthorId = result.id;
+      const cacheData = { ...authorData, _id: newAuthorId };
+      await redisClient.setEx(`author:${newAuthorId}`, 3600, JSON.stringify(cacheData));
+    }
+
     res.status(201).json(result);
   } catch (error) {
+    console.error('Error inserting author:', error);
     res.status(500).json({ error: error.message });
   }
 };
