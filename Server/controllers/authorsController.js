@@ -91,6 +91,26 @@ exports.createAuthor = async (redisClient, req, res) => {
   }
 };
 
+exports.deleteAuthor = async (redisClient, req, res) => {
+  console.log('inside deleteAuthor');
+  const useCache = process.env.USE_CACHE === 'true';
+
+  try {
+    console.log('Deleting author:', req.params);
+    const author = await db.get(req.params.id);
+    await db.destroy(author._id, author._rev);
+
+    if (useCache) {
+      console.log('Clearing cache');
+      await redisClient.del('authors');
+      await redisClient.del(`author:${req.params.id}`);
+    }
+    res.status(204).end();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.getAuthorById = async (req, res) => {
   try {
     const author = await db.get(req.params.id);
@@ -115,12 +135,3 @@ exports.updateAuthor = async (req, res) => {
   }
 };
 
-exports.deleteAuthor = async (req, res) => {
-  try {
-    const author = await db.get(req.params.id);
-    await db.destroy(author._id, author._rev);
-    res.status(204).end();
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
