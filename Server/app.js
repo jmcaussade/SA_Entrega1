@@ -47,7 +47,7 @@ if (process.env.USE_CADDY !== 'true') {
 
 // // Rutas de la API
 app.use('/api/authors', authorsRoutes(redisClient));
-app.use('/api/books', booksRoutes);
+app.use('/api/books', booksRoutes(redisClient));
 app.use('/api/reviews', reviewsRoutes);
 app.use('/api/sales', salesRoutes);
 app.use('/api/aggregated-data', aggregatedDataRoutes);
