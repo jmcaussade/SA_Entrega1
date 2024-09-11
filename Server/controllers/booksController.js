@@ -45,17 +45,35 @@ exports.getBooks = async (redisClient, req, res) => {
 };
 
 // Crear un libro e indexarlo en Elasticsearch
-exports.createBook = async (req, res) => {
+exports.createBook = async (redisClient, req, res) => {
+  console.log("dentro de createBook"); // Debugging
+  const useCache = process.env.USE_CACHE === 'true';
+  
   try {
     const result = await db.insert(req.body);
+    console.log('Book inserted:', result);
+
     // Indexar el libro en Elasticsearch
     await client.index({
       index: 'books',
       id: result.id,
       body: req.body,
     });
+    console.log('Book indexed in Elasticsearch');
+
+    if (useCache) {
+      console.log('Clearing cache');
+      await redisClient.del('books');
+
+      // Cache the newly created book data
+      console.log('Caching new book data');
+      const cacheData = { ...req.body, _id: result.id };
+      await redisClient.setEx(`book:${result.id}`, 3600, JSON.stringify(cacheData));
+    }
+
     res.status(201).json(result);
   } catch (error) {
+    console.error('Error creating book:', error);
     res.status(500).json({ error: error.message });
   }
 };
