@@ -4,7 +4,7 @@ const client = require('../utils/searchEngine');
 
 // Obtener todas las reseñas
 exports.getReviews = async (redisClient, req, res) => {
-  console.log("Fetching reviews..."); // Debugging
+  console.log("Inside getReviews"); // Debugging
   const useCache = process.env.USE_CACHE === 'true';
   const cacheKey = 'reviews';
 
@@ -42,10 +42,21 @@ exports.getReviews = async (redisClient, req, res) => {
 };
 
 // Eliminar una reseña
-exports.deleteReview = async (req, res) => {
+exports.deleteReview = async (redisClient, req, res) => {
+  console.log("Inside deletingReview..."); // Debugging
+  const useCache = process.env.USE_CACHE === 'true';
   try {
+    console.log("Deleting review with ID:", req.params.id); // Debugging
     const review = await db.get(req.params.id);
     await db.destroy(review._id, review._rev);
+
+    if (useCache) {
+      console.log("Deleting review from cache"); // Debugging
+      await redisClient.del('review:${req.params.id}');
+      await redisClient.del('reviews');
+      
+    }
+
     res.status(204).end();
   } catch (error) {
     res.status(500).json({ error: error.message });
