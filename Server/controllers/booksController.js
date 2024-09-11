@@ -128,17 +128,29 @@ exports.deleteBook = async (redisClient, req, res) => {
 };
 
 // Actualizar un libro
-exports.updateBook = async (req, res) => {
+exports.updateBook = async (redisClient, req, res) => {
+  console.log("dentro de updateBook"); // Debugging
   try {
     const book = await db.get(req.params.id);
     const updatedBook = { ...book, ...req.body };
     const result = await db.insert(updatedBook);
+
+    // Invalidate cache
+    const useCache = process.env.USE_CACHE === 'true';
+    if (useCache) {
+      console.log('Clearing cache');
+      await redisClient.del('books');
+
+      // Remove the specific book from cache
+      console.log('Removing book from cache');
+      await redisClient.del(`book:${req.params.id}`);
+    }
+
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 // Obtener un libro por ID
 exports.getBookById = async (req, res) => {
