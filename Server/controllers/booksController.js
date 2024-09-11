@@ -1,16 +1,24 @@
 const nano = require('nano')('http://admin:admin@couchdb:5984');
 const db = nano.use('bookstore');
+const client = require('../utils/searchEngine');
 
-// Crear un libro
+
+
+// Crear un libro e indexarlo en Elasticsearch
 exports.createBook = async (req, res) => {
   try {
     const result = await db.insert(req.body);
+    // Indexar el libro en Elasticsearch
+    await client.index({
+      index: 'books',
+      id: result.id,
+      body: req.body,
+    });
     res.status(201).json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 // Obtener todos los libros
 exports.getBooks = async (req, res) => {
@@ -55,11 +63,17 @@ exports.updateBook = async (req, res) => {
   }
 };
 
-// Eliminar un libro
+
+// Eliminar un libro y removerlo de Elasticsearch
 exports.deleteBook = async (req, res) => {
   try {
     const book = await db.get(req.params.id);
     await db.destroy(book._id, book._rev);
+    // Eliminar de Elasticsearch
+    await client.delete({
+      index: 'books',
+      id: book._id,
+    });
     res.status(204).end();
   } catch (error) {
     res.status(500).json({ error: error.message });

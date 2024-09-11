@@ -1,4 +1,37 @@
 miapp.localhost {
-    reverse_proxy /api/* http://backend:5000
-    reverse_proxy frontend:5173
+    # Serve the static frontend files from Vite (React)
+    root * /srv
+    file_server
+
+    # Proxy API requests to the backend (Express)
+    handle /api/* {
+        reverse_proxy backend:5000
+    }
+
+    # Proxy Elasticsearch search requests
+    handle /api/search-books/* {
+        reverse_proxy elasticsearch:9200
+    }
+
+    # Serve React application (SPA fallback)
+    handle {
+        try_files {path} /index.html
+    }
+
+    # Enable gzip compression
+    encode gzip
+
+    # Logging for access and errors
+    log {
+        output file /var/log/caddy/miapp_access.log
+    }
+
+    # Error handling (optional)
+    handle_errors {
+        @404 {
+            expression {http.error.status_code} == 404
+        }
+        rewrite @404 /index.html
+        file_server
+    }
 }

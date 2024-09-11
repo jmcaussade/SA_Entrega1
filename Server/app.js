@@ -13,7 +13,6 @@ const searchBooksRoutes = require('./routes/searchBooks')
 const topsalesRoutes = require('./routes/topsales')
 
 
-
 const app = express();
 const port = 5000;
 
@@ -21,8 +20,10 @@ const port = 5000;
 app.use(cors());
 app.use(express.json()); // Middleware para parsear JSON
 
-// Middleware para servir archivos estáticos
-app.use(express.static(path.join(__dirname, 'dist')));
+// Sirve archivos estáticos si no se está usando Caddy
+if (process.env.USE_CADDY !== 'true') {
+  app.use(express.static(path.join(__dirname, 'dist')));
+}
 
 // // Rutas de la API
 app.use('/api/authors', authorsRoutes);
