@@ -14,7 +14,6 @@ const fetchAuthors = async (redisClient, req, res) => {
     console.log('Attempting to fetch from cache'); // Log before fetching from cache
     try {
       const data = await redisClient.get(cacheKey);
-      console.log('Inside redisClient.get callback'); // Log inside the callback
 
       if (data) {
         console.log('Fetching authors from cache');
