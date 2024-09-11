@@ -111,6 +111,35 @@ exports.deleteAuthor = async (redisClient, req, res) => {
   }
 };
 
+exports.updateAuthor = async (redisClient, req, res) => {
+  console.log('inside updateAuthor');
+  const useCache = process.env.USE_CACHE === 'true';
+  console.log("req.params: ", req.params);
+
+  try {
+    const author = await db.get(req.params.id);
+    console.log('Updating author:', author);
+
+    const updatedAuthorData = { ...author, ...req.body, _id: author._id, _rev: author._rev };
+    console.log('Prepared updatedAuthorData:', updatedAuthorData);
+
+    const result = await db.insert(updatedAuthorData);
+    console.log('Updated author result:', result);
+
+    if (useCache) {
+      console.log('Clearing cache');
+      await redisClient.del('authors');
+
+      // Cache the updated author data
+      console.log('Caching updated author data');
+      await redisClient.setEx(`author:${req.params.id}`, 3600, JSON.stringify(updatedAuthorData));
+    }
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.getAuthorById = async (req, res) => {
   try {
     const author = await db.get(req.params.id);
@@ -124,14 +153,4 @@ exports.getAuthorById = async (req, res) => {
   }
 };
 
-exports.updateAuthor = async (req, res) => {
-  try {
-    const author = await db.get(req.params.id);
-    const updatedAuthor = { ...author, ...req.body };
-    const result = await db.insert(updatedAuthor);
-    res.status(200).json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
 
