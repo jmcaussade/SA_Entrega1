@@ -1,4 +1,4 @@
-const nano = require('nano')('http://admin:admin@couchdb:5984');
+const nano = require('nano')('http://admin:admin@localhost:5984');
 const db = nano.use('bookstore');
 const { fetchAuthors } = require('./authorsController');
 
