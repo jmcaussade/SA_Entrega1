@@ -79,22 +79,53 @@ exports.createBook = async (redisClient, req, res) => {
 };
 
 // Eliminar un libro y removerlo de Elasticsearch
-exports.deleteBook = async (req, res) => {
+exports.deleteBook = async (redisClient, req, res) => {
+  console.log("dentro de deleteBook"); // Debugging
+  const useCache = process.env.USE_CACHE === 'true';
+
   try {
+    console.log('Received request to delete book with ID:', req.params.id); // Log the received ID
     const book = await db.get(req.params.id);
+    console.log('Book to delete:', book);
+
     await db.destroy(book._id, book._rev);
-    // Eliminar de Elasticsearch
-    await client.delete({
-      index: 'books',
-      id: book._id,
-    });
+    console.log('Book deleted from database');
+
+    // Delete from Elasticsearch
+    try {
+      await client.delete({
+        index: 'books',
+        id: req.params.id
+      });
+      console.log('Book deleted from Elasticsearch');
+    } catch (esError) {
+      if (esError.meta && esError.meta.statusCode === 404) {
+        console.warn('Book not found in Elasticsearch');
+      } else {
+        throw esError;
+      }
+    }
+
+    if (useCache) {
+      console.log('Invalidating cache for the book:', book._id);
+      await redisClient.del(`book:${book._id}`);
+
+      //Invalidating cache for the hole books list
+      console.log('Invalidating cache for all books');
+      await redisClient.del('books');
+    }
+
     res.status(204).end();
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    if (error.statusCode === 404 && error.reason === 'deleted') {
+      console.log('Book already deleted:', req.params.id);
+      res.status(204).end(); // No Content
+    } else {
+      console.error('Error deleting book:', error);
+      res.status(500).json({ error: error.message });
+    }
   }
 };
-
-
 
 // Actualizar un libro
 exports.updateBook = async (req, res) => {
