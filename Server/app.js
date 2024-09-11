@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const cors = require("cors");
+const redis = require('redis');
+require('dotenv').config();
 
 const booksRoutes = require('./routes/books');
 const authorsRoutes = require('./routes/authors');
@@ -16,6 +18,24 @@ const topsalesRoutes = require('./routes/topsales')
 const app = express();
 const port = 5000;
 
+console.log("Starting application...")
+
+//Redis client
+const redisClient = redis.createClient();
+
+redisClient.on('error', (error) => {
+  console.error('Error connecting to Redis:', error);
+});
+
+redisClient.on('ready', () => {
+  console.log('Redis client started');
+});
+
+(async () => {
+  await redisClient.connect();
+  await redisClient.ping();
+})();
+
 // Middleware para habilitar CORS
 app.use(cors());
 app.use(express.json()); // Middleware para parsear JSON
@@ -26,7 +46,7 @@ if (process.env.USE_CADDY !== 'true') {
 }
 
 // // Rutas de la API
-app.use('/api/authors', authorsRoutes);
+app.use('/api/authors', authorsRoutes(redisClient));
 app.use('/api/books', booksRoutes);
 app.use('/api/reviews', reviewsRoutes);
 app.use('/api/sales', salesRoutes);

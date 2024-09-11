@@ -1,27 +1,65 @@
 const nano = require('nano')('http://admin:admin@localhost:5984');
 const db = nano.use('bookstore');
+const redis = require('redis');
+const { promisify } = require('util');
 
 // Function to fetch authors from the database
-const fetchAuthors = async () => {
-  const result = await db.list({ include_docs: true });
-  return result.rows.filter(row => row.doc.type === 'author').map(row => row.doc);
+const fetchAuthors = async (redisClient, req, res) => {
+  console.log('Fetching authors...');
+  const useCache = process.env.USE_CACHE === 'true';
+  console.log('USE_CACHE:', process.env.USE_CACHE); // Log the value of USE_CACHE
+  const cacheKey = 'authors';
+
+  if (useCache) {
+    console.log('Attempting to fetch from cache'); // Log before fetching from cache
+    try {
+      const data = await redisClient.get(cacheKey);
+      console.log('Inside redisClient.get callback'); // Log inside the callback
+
+      if (data) {
+        console.log('Fetching authors from cache');
+        const authors = JSON.parse(data);
+        //console.log('Authors from cache:', authors); // Log the authors data from cache
+        return res.json(authors);
+      } else {
+        console.log('Cache miss. Fetching authors from database');
+        const result = await db.list({ include_docs: true });
+        const authors = result.rows.filter(row => row.doc.type === 'author').map(row => row.doc);
+        //console.log('Authors from database:', authors); // Log the authors data from database
+        await redisClient.setEx(cacheKey, 3600, JSON.stringify(authors));
+        return res.json(authors);
+      }
+    } catch (err) {
+      console.error('Error fetching from cache:', err);
+      return res.status(500).json({ error: 'Error fetching from cache' });
+    }
+  } else {
+    console.log('Fetching authors from database (cache disabled)');
+    try {
+      const result = await db.list({ include_docs: true });
+      const authors = result.rows.filter(row => row.doc.type === 'author').map(row => row.doc);
+      //console.log('Authors from database:', authors); // Log the authors data from database
+      return res.json(authors);
+    } catch (dbError) {
+      console.error('Error fetching authors from database:', dbError);
+      return res.status(500).json({ error: 'Error fetching authors from database' });
+    }
+  }
 };
 
-exports.fetchAuthors = fetchAuthors;
-
-exports.createAuthor = async (req, res) => {
+exports.getAuthors = async (redisClient, req, res) => {
+  console.log('Inside getAuthors controller');
   try {
-    const result = await db.insert(req.body);
-    res.status(201).json(result);
+    await fetchAuthors(redisClient, req, res);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-exports.getAuthors = async (req, res) => {
+exports.createAuthor = async (req, res) => {
   try {
-    const authors = await fetchAuthors();
-    res.status(200).json(authors);
+    const result = await db.insert(req.body);
+    res.status(201).json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
