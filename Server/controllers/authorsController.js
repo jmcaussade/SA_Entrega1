@@ -151,4 +151,40 @@ exports.getAuthorById = async (req, res) => {
   }
 };
 
+//Data for aggregatedData function
+exports.getAuthorsData = async (redisClient, req, res) => {
+  console.log('Fetching authors data...');
+  const useCache = process.env.USE_CACHE === 'true';
+  const cacheKey = 'authors';
 
+  if (useCache) {
+    console.log('Attempting to fetch from cache');
+    try {
+      const data = await redisClient.get(cacheKey);
+
+      if (data) {
+        console.log('Fetching authors from cache');
+        return JSON.parse(data);
+      } else {
+        console.log('Cache miss. Fetching authors from database');
+        const result = await db.list({ include_docs: true });
+        const authors = result.rows.filter(row => row.doc.type === 'author').map(row => row.doc);
+        await redisClient.setEx(cacheKey, 3600, JSON.stringify(authors));
+        return authors;
+      }
+    } catch (err) {
+      console.error('Error fetching from cache:', err);
+      throw new Error('Error fetching from cache');
+    }
+  } else {
+    console.log('Fetching authors from database (cache disabled)');
+    try {
+      const result = await db.list({ include_docs: true });
+      const authors = result.rows.filter(row => row.doc.type === 'author').map(row => row.doc);
+      return authors;
+    } catch (dbError) {
+      console.error('Error fetching authors from database:', dbError);
+      throw new Error('Error fetching authors from database');
+    }
+  }
+};

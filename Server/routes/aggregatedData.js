@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const aggregatedDataController = require('../controllers/aggregatedDataController');
 
-router.get('/', aggregatedDataController.getAggregatedData);
+module.exports = (redisClient) => {
+    router.get('/', (req, res) => {aggregatedDataController.getAggregatedData(redisClient, req, res)});
 
-module.exports = router;
+    return router;
+};
