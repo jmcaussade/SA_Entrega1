@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   couchdb:
     image: couchdb:latest
@@ -20,12 +18,10 @@ services:
     environment:
       - COUCHDB_URL=http://admin:admin@couchdb:5984
       - REDIS_URL=redis://redis:6379
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
       - USE_CACHE=true
     depends_on:
       - couchdb
       - redis
-      - elasticsearch
       
   redis:
     image: redis:latest
@@ -41,18 +37,6 @@ services:
     depends_on:
       - backend
 
-  caddy:
-    image: caddy:latest
-    container_name: caddy
-    ports:
-      - "80:80"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-    depends_on:
-      - frontend
-      - backend
-      - elasticsearch
-
   populate-db:
     build:
       context: ./Server
@@ -61,16 +45,5 @@ services:
     depends_on:
       - couchdb
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.1
-    container_name: elasticsearch
-    environment:
-      - discovery.type=single-node
-    ports:
-      - "9200:9200"
-    volumes:
-      - elasticsearch_data:/usr/share/elasticsearch/data
-
 volumes:
   couchdb_data:
-  elasticsearch_data:

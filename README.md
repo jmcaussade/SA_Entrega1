@@ -111,16 +111,34 @@ Este error indica que no se ha definido una ruta correspondiente en el frontend.
 
 Para dockerizar el proyecto correctamente se deben correr los siguientes comandos desde la carpeta raiz (SA_Entrega1).
 
-* docker-compose build
-* docker-compose up
-
 ## Advertencia!!
 
-* Antes de correr el docker hay que buildear tanto front como server porque en el repositorio no se incluyen los archivos de node.
+* Antes de correr el docker hay que istalar dependencias tanto front como backend como se muestra "Instalacion y ejecucion" en el repositorio no se incluyen los archivos de node.
 
-Finalmente, para poblar la base de datos del contenedor solo hay que ejecutar los siguientes comandos desde la carpeta raiz (fuera del contenedor):
+## Docker APP + Database
 
-```bash
-cd ../server
-node scripts/populateDatabase.js
-```
+* docker-compose -f docker-compose.base.yml build
+* docker-compose -f docker-compose.base.yml up
+
+## Docker APP + Database + Cache
+
+* docker-compose -f docker-compose.cache.yml build
+* docker-compose -f docker-compose.cache.yml up
+
+## Docker APP + Database + Proxy
+
+* docker-compose -f docker-compose.cache.yml build
+* docker-compose -f docker-compose.cache.yml up
+
+## Docker APP + Database + Search Engine
+
+* docker-compose -f docker-compose.proxy.yml build
+* docker-compose -f docker-compose.proxy.yml up
+
+## Docker APP + Database + Cache + Proxy + Search Engine
+
+* docker-compose -f docker-compose.search.yml build
+* docker-compose -f docker-compose.search.yml up
+
+
+### Finalmente, la base de datos del contenedor se poblara sola una vez ejecutado docker compose up.

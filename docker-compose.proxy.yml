@@ -1,0 +1,54 @@
+verservices:
+  couchdb:
+    image: couchdb:latest
+    container_name: couchdb
+    ports:
+      - "5984:5984"
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=admin
+    volumes:
+      - couchdb_data:/opt/couchdb/data
+
+  backend:
+    build: ./Server
+    container_name: backend
+    ports:
+      - "5000:5000"
+    environment:
+      - COUCHDB_URL=http://admin:admin@couchdb:5984
+      - USE_CACHE=false
+    depends_on:
+      - couchdb
+
+
+  frontend:
+    build: ./Front
+    container_name: frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    ports:
+      - "80:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    depends_on:
+      - frontend
+      - backend
+
+  populate-db:
+    build:
+      context: ./Server
+    container_name: populate-db
+    entrypoint: ["node", "scripts/populateDatabase.js"]
+    depends_on:
+      - couchdb
+
+
+volumes:
+  couchdb_data:
