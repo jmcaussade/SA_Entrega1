@@ -114,6 +114,10 @@ Para dockerizar el proyecto correctamente se deben correr los siguientes comando
 * docker-compose build
 * docker-compose up
 
+## Advertencia!!
+
+* Antes de correr el docker hay que buildear tanto front como server porque en el repositorio no se incluyen los archivos de node.
+
 Finalmente, para poblar la base de datos del contenedor solo hay que ejecutar los siguientes comandos desde la carpeta raiz (fuera del contenedor):
 
 ```bash
