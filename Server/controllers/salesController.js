@@ -41,16 +41,36 @@ exports.getSales = async (redisClient, req, res) => {
   }
 };
 
-exports.createSale = async (req, res) => {
+// Crear una venta
+exports.createSale = async (redisClient, req, res) => {
+  console.log("Inside createSale"); // Debugging
+  const useCache = process.env.USE_CACHE === 'true';
+
   try {
     const sale = { ...req.body, type: 'sale' };
     const result = await db.insert(sale);
+    console.log("Sale created:", result); // Debugging
+
+    // Invalidate and update cache
+    if (useCache) {
+      console.log('Clearing cache');
+      await redisClient.del('sales');
+
+      // Fetch updated sales data
+      const updatedResult = await db.list({ include_docs: true });
+      const updatedSales = updatedResult.rows.filter(row => row.doc.type === 'sale').map(row => row.doc);
+
+      // Cache the updated sales data
+      console.log('Caching updated sales data');
+      await redisClient.setEx('sales', 3600, JSON.stringify(updatedSales)); // Cache for 1 hour
+    }
+
     res.status(201).json(result);
   } catch (error) {
+    console.error("Error creating sale:", error); // Debugging
     res.status(500).json({ error: error.message });
   }
 };
-
 
 
 exports.updateSale = async (req, res) => {
