@@ -19,37 +19,43 @@ const BookList = () => {
       const response = await axios.get('http://miapp.localhost:5000/api/books');
       setBooks(response.data);
       setLoading(false);
+      console.log('Books fetched:', response.data); // Log the fetched books
     } catch (error) {
       setError(error.message);
       setLoading(false);
+      console.error('Error fetching books:', error); // Log the error
     }
   };
 
   const fetchAuthors = async () => {
     try {
       const response = await axios.get('http://miapp.localhost:5000/api/authors');
-      const authorsData = response.data;
-      // Create a mapping from author ID to author name
-      const authorsMap = authorsData.reduce((acc, author) => {
+      const authorsMap = response.data.reduce((acc, author) => {
         acc[author._id] = author.name;
         return acc;
       }, {});
       setAuthors(authorsMap);
+      console.log('Authors fetched:', authorsMap); // Log the fetched authors
     } catch (error) {
       setError(error.message);
+      console.error('Error fetching authors:', error); // Log the error
     }
   };
 
   const deleteBook = async (id) => {
+    console.log('Deleting book with ID:', id); // Log the ID of the book being deleted
     try {
       await axios.delete(`http://miapp.localhost:5000/api/books/${id}`);
-      fetchBooks();
+      console.log('Book deleted successfully');
+      fetchBooks(); // Refresh the list of books
     } catch (error) {
+      console.error('Error deleting book:', error);
       setError(error.message);
     }
   };
 
   const editBook = (book) => {
+    console.log('Editing book:', book); // Log the book being edited
     setEditingBook(book);
   };
 
@@ -71,10 +77,13 @@ const BookList = () => {
             <p>Summary: {book.summary}</p>
             <p>Date of Publication: {book.date_of_publication}</p>
             <p>Number of Sales: {book.number_of_sales}</p>
-            <p>Author Name: {authors[book.author] || 'Unknown'}</p>
-            <p>Author ID: {book.author}</p>
+            <p>Author: {authors[book.author]}</p>
+            <p>Book ID:{book._id}</p>
             <button onClick={() => editBook(book)}>Edit</button>
-            <button onClick={() => deleteBook(book._id)}>Delete</button>
+            <button onClick={() => {
+              console.log('Book ID from front:', book._id); // Log the book ID
+              deleteBook(book._id);
+            }}>Delete</button>
           </li>
         ))}
       </ul>

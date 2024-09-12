@@ -1,10 +1,12 @@
-const nano = require('nano')('http://admin:admin@couchdb:5984');
+const nano = require('nano')('http://admin:admin@localhost:5984');
 const db = nano.use('bookstore');
-const { fetchAuthors } = require('./authorsController');
+const { getAuthorsData } = require('./authorsController');
 
-const getAggregatedData = async (req, res) => {
+const getAggregatedData = async (redisClient, req, res) => {
+  console.log("Inside getAggregatedData controller");
   try {
-    const authors = await fetchAuthors();
+    let authors = await getAuthorsData(redisClient, req, res);
+    console.log('Authors:', authors);
     const books = await db.list({ include_docs: true });
     const reviews = await db.list({ include_docs: true });
     const sales = await db.list({ include_docs: true });

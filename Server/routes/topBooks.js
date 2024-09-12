@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { getTopRatedBooks } = require('../controllers/topBooksController');
 
-router.get('/', getTopRatedBooks);
+module.exports = (redisClient) => {
+    router.get('/', (req, res) => {getTopRatedBooks(redisClient, req, res)});
 
-module.exports = router;
+    return router;
+};

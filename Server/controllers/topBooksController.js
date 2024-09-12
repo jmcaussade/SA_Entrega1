@@ -1,9 +1,28 @@
-const nano = require('nano')('http://admin:admin@couchdb:5984');
+const nano = require('nano')('http://admin:admin@localhost:5984');
 const db = nano.use('bookstore');
 
-const getTopRatedBooks = async (req, res) => {
+const getTopRatedBooks = async (redisClient, req, res) => {
+  console.log('Inside getTopRatedBooks controller');
   try {
     console.log("Retrieving data...");
+
+    const useCache = process.env.USE_CACHE === 'true';
+    const cacheKey = 'topRatedBooks';
+
+    if (useCache) {
+      console.log('Attempting to fetch from cache');
+      const cachedData = await redisClient.get(cacheKey);
+      console.log('cachedData:', cachedData);
+
+      if (cachedData) {
+        console.log('Fetching top-rated books from cache');
+        return res.json(JSON.parse(cachedData));
+      } else {
+        console.log('Cache miss. Fetching top-rated books from database');
+      }
+    } else {
+      console.log("Fetching top-rated books from database (cache disabled)");
+    }
 
     const books = await db.list({ include_docs: true });
     const reviews = await db.list({ include_docs: true });
@@ -13,9 +32,9 @@ const getTopRatedBooks = async (req, res) => {
     const reviewDocs = reviews.rows.filter(row => row.doc.type === 'review').map(row => row.doc);
     const authorDocs = authors.rows.filter(row => row.doc.type === 'author').map(row => row.doc);
 
-    console.log('Books Documents:', bookDocs);
-    console.log('Reviews Documents:', reviewDocs);
-    console.log('Authors Documents:', authorDocs);
+    // console.log('Books Documents:', bookDocs);
+    // console.log('Reviews Documents:', reviewDocs);
+    // console.log('Authors Documents:', authorDocs);
 
     // Create an author map
     const authorsMap = authorDocs.reduce((map, author) => {
@@ -23,7 +42,7 @@ const getTopRatedBooks = async (req, res) => {
       return map;
     }, {});
 
-    console.log('Authors Map:', authorsMap);
+    // console.log('Authors Map:', authorsMap);
 
     // Group reviews by book ID
     const reviewsByBook = reviewDocs.reduce((acc, review) => {
@@ -34,7 +53,7 @@ const getTopRatedBooks = async (req, res) => {
       return acc;
     }, {});
 
-    console.log('Reviews By Book:', reviewsByBook);
+    // console.log('Reviews By Book:', reviewsByBook);
 
     // Process books and calculate average ratings
     const booksWithRatings = bookDocs.map(book => {
@@ -62,7 +81,12 @@ const getTopRatedBooks = async (req, res) => {
       .sort((a, b) => b.avgRating - a.avgRating)
       .slice(0, 10);
 
-    console.log('Top 10 Books:', topBooks);
+    // console.log('Top 10 Books:', topBooks);
+
+    if (useCache) {
+      console.log('Storing top-rated books in cache');
+      await redisClient.setEx(cacheKey, 3600, JSON.stringify(topBooks)); // Cache for 1 hour
+    }
 
     res.json(topBooks);
   } catch (err) {
@@ -70,6 +94,7 @@ const getTopRatedBooks = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+
 
 // Function to calculate average rating for a book
 const calculateAvgRating = (bookId, reviewsByBook) => {
