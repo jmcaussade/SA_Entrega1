@@ -104,12 +104,32 @@ exports.updateSale = async (redisClient, req, res) => {
   }
 };
 
-exports.deleteSale = async (req, res) => {
+exports.deleteSale = async (redisClient, req, res) => {
+  console.log("Inside deleteSale"); // Debugging
+  const useCache = process.env.USE_CACHE === 'true';
+  
   try {
     const sale = await db.get(req.params.id);
     await db.destroy(sale._id, sale._rev);
+    console.log("Sale deleted:", sale); // Debugging
+
+    // Invalidate and update cache
+    if (useCache) {
+      console.log('Clearing cache');
+      await redisClient.del('sales');
+
+      // Fetch updated sales data
+      const updatedResult = await db.list({ include_docs: true });
+      const updatedSales = updatedResult.rows.filter(row => row.doc.type === 'sale').map(row => row.doc);
+
+      // Cache the updated sales data
+      console.log('Caching updated sales data');
+      await redisClient.set('sales', JSON.stringify(updatedSales), 'EX', 3600); // Cache for 1 hour
+    }
+
     res.status(204).end();
   } catch (error) {
+    console.error("Error deleting sale:", error); // Debugging
     res.status(500).json({ error: error.message });
   }
 };
