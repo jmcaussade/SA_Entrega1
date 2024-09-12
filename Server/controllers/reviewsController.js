@@ -64,17 +64,32 @@ exports.deleteReview = async (redisClient, req, res) => {
 };
 
 // Actualizar una reseña
-exports.updateReview = async (req, res) => {
+exports.updateReview = async (redisClient, req, res) => {
+  console.log("Inside updateReview..."); // Debugging
+  
   try {
     const review = await db.get(req.params.id);
     const updatedReview = { ...review, ...req.body };
     const result = await db.insert(updatedReview);
+
+    // Invalidate cache
+    const useCache = process.env.USE_CACHE === 'true';
+    if (useCache) {
+      console.log('Clearing cache');
+      await redisClient.del('reviews');
+
+      // Remove the specific review from cache
+      console.log('Removing review from cache');
+      await redisClient.del(`review:${req.params.id}`);
+    }
+
     res.status(200).json(result);
   } catch (error) {
     console.error("Error updating review:", error); // Debugging
     res.status(500).json({ error: error.message });
   }
 };
+
 
 // Crear una reseña
 exports.createReview = async (req, res) => {
