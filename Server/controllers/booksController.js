@@ -69,6 +69,10 @@ exports.createBook = async (redisClient, req, res) => {
       console.log('Caching new book data');
       const cacheData = { ...req.body, _id: result.id };
       await redisClient.setEx(`book:${result.id}`, 3600, JSON.stringify(cacheData));
+      // Invalidate the cache for top-rated books
+      const cacheKey = 'topRatedBooks';
+      await redisClient.del(cacheKey);
+      console.log('Cache invalidated for top-rated books');
     }
 
     res.status(201).json(result);
@@ -113,6 +117,11 @@ exports.deleteBook = async (redisClient, req, res) => {
       //Invalidating cache for the hole books list
       console.log('Invalidating cache for all books');
       await redisClient.del('books');
+
+      // Invalidate the cache for top-rated books
+      const cacheKey = 'topRatedBooks';
+      await redisClient.del(cacheKey);
+      console.log('Cache invalidated for top-rated books');
     }
 
     res.status(204).end();
@@ -144,6 +153,11 @@ exports.updateBook = async (redisClient, req, res) => {
       // Remove the specific book from cache
       console.log('Removing book from cache');
       await redisClient.del(`book:${req.params.id}`);
+
+      // Invalidate the cache for top-rated books
+      const cacheKey = 'topRatedBooks';
+      await redisClient.del(cacheKey);
+      console.log('Cache invalidated for top-rated books');
     }
 
     res.status(200).json(result);

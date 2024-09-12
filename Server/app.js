@@ -51,7 +51,7 @@ app.use('/api/books', booksRoutes(redisClient));
 app.use('/api/reviews', reviewsRoutes(redisClient));
 app.use('/api/sales', salesRoutes(redisClient));
 app.use('/api/aggregated-data', aggregatedDataRoutes(redisClient));
-app.use('/api/top-books', topBooksRoutes);
+app.use('/api/top-books', topBooksRoutes(redisClient));
 app.use('/api/search-books', searchBooksRoutes);
 app.use('/api/top-sales', topsalesRoutes)
 
