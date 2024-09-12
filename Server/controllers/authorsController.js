@@ -1,7 +1,6 @@
 const nano = require('nano')('http://admin:admin@localhost:5984');
 const db = nano.use('bookstore');
-const redis = require('redis');
-const { promisify } = require('util');
+
 
 // Function to fetch authors from the database
 const fetchAuthors = async (redisClient, req, res) => {
