@@ -92,7 +92,9 @@ exports.updateReview = async (redisClient, req, res) => {
 
 
 // Crear una reseña
-exports.createReview = async (req, res) => {
+exports.createReview = async (redisClient, req, res) => {
+  console.log("Inside createReview..."); // Debugging
+  
   try {
     console.log("Request Body:", req.body); // Debugging
     const review = {
@@ -100,6 +102,14 @@ exports.createReview = async (req, res) => {
       type: 'review',
     };
     const result = await db.insert(review);
+
+    // Invalidate cache
+    const useCache = process.env.USE_CACHE === 'true';
+    if (useCache) {
+      console.log('Clearing cache');
+      await redisClient.del('reviews');
+    }
+
     res.status(201).json(result);
   } catch (error) {
     console.error("Error creating review:", error); // Debugging
